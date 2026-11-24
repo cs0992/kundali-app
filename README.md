@@ -1,5 +1,4 @@
 [vedic_kundali_generator.html](https://github.com/user-attachments/files/35316975/vedic_kundali_generator.html)
-# kundali-app<!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
