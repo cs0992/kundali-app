@@ -1,843 +1,1621 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vedic Kundali & Cosmic Horoscope Generator</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            cosmic: {
-              900: '#0B0D1B',
-              800: '#12162D',
-              700: '#1C2244',
-              gold: '#E2B049',
-              goldHover: '#F4C45E',
-              saffron: '#FF7722',
-              crimson: '#9B1B30'
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vedic Rashiphal Codex & Kundali Engine</title>
+    <!-- Tailwind CSS -->
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vedic Rashiphal Codex & Kundali Engine</title>
+    <!-- Tailwind CSS -->
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vedic Rashiphal Codex & Kundali Engine</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@300;400;500;600;700&family=Space+Mono&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        celestial: {
+                            900: '#060913',
+                            800: '#0b1120',
+                            700: '#121b2d',
+                            600: '#1a263d',
+                            accent: '#d4af37', // Antique Gold
+                            accentLight: '#f3e5ab',
+                            purple: '#6d28d9',
+                            rose: '#e11d48',
+                        }
+                    },
+                    fontFamily: {
+                        cinzel: ['Cinzel', 'serif'],
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Space Mono', 'monospace'],
+                    }
+                }
             }
-          },
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            serif: ['Cinzel', 'Georgia', 'serif']
-          }
         }
-      }
-    };
-  </script>
-  <!-- Google Fonts: Inter & Cinzel -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #070913;
-      color: #E2E8F0;
-    }
-    .font-serif-title {
-      font-family: 'Cinzel', serif;
-    }
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #0D1022;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #334155;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #E2B049;
-    }
-    .chart-container {
-      position: relative;
-      width: 100%;
-      max-width: 440px;
-      aspect-ratio: 1 / 1;
-      margin: 0 auto;
-    }
-  </style>
-</head>
-<body class="min-h-screen flex flex-col bg-[#070913] text-slate-100 antialiased selection:bg-cosmic-gold selection:text-cosmic-900">
-
-  <!-- Header -->
-  <header class="border-b border-slate-800/80 bg-[#0B0D1B]/90 backdrop-blur sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cosmic-saffron via-purple-600 to-cosmic-gold p-0.5 shadow-lg shadow-cosmic-gold/20 flex items-center justify-center">
-          <div class="w-full h-full bg-[#070913] rounded-[10px] flex items-center justify-center">
-            <i class="fa-solid fa-om text-cosmic-gold text-lg"></i>
-          </div>
-        </div>
-        <div>
-          <h1 class="text-lg sm:text-xl font-bold font-serif-title tracking-wide bg-gradient-to-r from-cosmic-gold via-amber-200 to-cosmic-saffron bg-clip-text text-transparent">
-            Jyotish Kundali Sanctuary
-          </h1>
-          <p class="text-[11px] text-slate-400">Lahiri Ayanamsha • Real-Time Client-Side Vedic Engine</p>
-        </div>
-      </div>
-      <div class="flex items-center space-x-3">
-        <button onclick="window.print()" class="px-3 py-1.5 rounded-xl border border-slate-700 bg-cosmic-700/60 hover:bg-slate-700 text-amber-300 transition text-xs flex items-center gap-2">
-          <i class="fa-solid fa-download"></i>
-          <span class="hidden sm:inline">Export PDF</span>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Main Content -->
-  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
-    
-    <!-- Left Column: Input Form & City Lookup (lg:col-span-4) -->
-    <section class="lg:col-span-4 space-y-6">
-      <div class="bg-cosmic-800/90 border border-slate-800 rounded-3xl p-6 shadow-2xl relative overflow-hidden backdrop-blur-xl">
-        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-600 via-cosmic-gold to-cosmic-saffron"></div>
+    </script>
+    <style>
+        body {
+            background-color: #060913;
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(109, 40, 217, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(212, 175, 55, 0.05) 0%, transparent 40%);
+        }
+        .gold-border { border-color: rgba(212, 175, 55, 0.3); }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #fff2ac 0%, #d4af37 50%, #aa7c11 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gold-button {
+            background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+            color: #060913;
+            font-weight: 700;
+        }
+        .gold-button:hover {
+            background: linear-gradient(135deg, #ebd072 0%, #d4af37 100%);
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0b1120; }
+        ::-webkit-scrollbar-thumb { background: #1a263d; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #d4af37; }
         
-        <h2 class="text-base font-bold font-serif-title text-cosmic-gold mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-sliders text-cosmic-saffron"></i> Kundali Details & City Search
-        </h2>
+        .chart-line { stroke: rgba(212, 175, 55, 0.4); stroke-width: 1.5; }
+        .chart-box { fill: #0b1120; stroke: rgba(212, 175, 55, 0.5); stroke-width: 1.5; }
+        .chart-text-rashi { fill: rgba(212, 175, 55, 0.7); font-size: 11px; font-family: 'Cinzel', serif; font-weight: bold; }
+        .chart-text-planet { fill: #e2e8f0; font-size: 10px; font-weight: 600; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
 
-        <form id="kundaliForm" class="space-y-4">
-          <!-- City Search Input with Nominatim Lookup -->
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Birth Location / City</label>
-            <div class="relative">
-              <input type="text" id="cityNameInput" placeholder="Search city (e.g. Bisalpur, Pali, Delhi)..." value="Birthplace" required class="w-full bg-cosmic-700/80 border border-slate-700 rounded-xl pl-3 pr-10 py-2 text-xs text-slate-100 focus:outline-none focus:border-cosmic-gold transition">
-              <button type="button" id="btnSearchCity" class="absolute right-2 top-1.5 text-cosmic-gold hover:text-amber-300 px-2 py-0.5 text-xs">
-                <i class="fa-solid fa-magnifying-glass"></i>
-              </button>
-            </div>
-            <!-- City Search Results Dropdown -->
-            <div id="citySearchResults" class="hidden mt-1 bg-cosmic-900 border border-slate-700 rounded-xl overflow-hidden max-h-48 overflow-y-auto text-xs z-50"></div>
-          </div>
-
-          <!-- Name -->
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Full Name</label>
-            <input type="text" id="userName" value="Name" required class="w-full bg-cosmic-700/80 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-cosmic-gold transition">
-          </div>
-
-          <!-- Date and Time -->
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Date of Birth</label>
-              <input type="date" id="dob" value="Value" required class="w-full bg-cosmic-700/80 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-cosmic-gold transition">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Time of Birth</label>
-              <input type="time" id="tob" value="00:00" step="60" required class="w-full bg-cosmic-700/80 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-cosmic-gold transition">
-            </div>
-          </div>
-
-          <!-- Lat, Lon, Timezone Offset -->
-          <div class="grid grid-cols-3 gap-2">
-            <div>
-              <label class="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Lat (°)</label>
-              <input type="number" id="latitude" step="0.0001" value="25.0378" required class="w-full bg-cosmic-700/80 border border-slate-700 rounded-xl px-2 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-cosmic-gold transition">
-            </div>
-            <div>
-              <label class="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Lon (°)</label>
-              <input type="number" id="longitude" step="0.0001" value="73.0763" required class="w-full bg-cosmic-700/80 border border-slate-700 rounded-xl px-2 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-cosmic-gold transition">
-            </div>
-            <div>
-              <label class="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">TZ (hrs)</label>
-              <input type="number" id="tzOffset" step="0.5" value="5.5" required class="w-full bg-cosmic-700/80 border border-slate-700 rounded-xl px-2 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-cosmic-gold transition">
-            </div>
-          </div>
-
-          <!-- Submit Button -->
-          <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-cosmic-gold to-cosmic-saffron hover:from-cosmic-goldHover hover:to-orange-500 text-cosmic-900 font-bold text-xs tracking-wide uppercase transition duration-200 shadow-lg shadow-cosmic-gold/20 flex items-center justify-center gap-2 mt-2">
-            <i class="fa-solid fa-dharmachakra"></i> Calculate Kundali
-          </button>
-        </form>
-      </div>
-
-      <!-- Quick Summary Card -->
-      <div id="summaryCard" class="bg-cosmic-800/60 border border-slate-800 rounded-3xl p-5 space-y-3 backdrop-blur-xl">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-          <i class="fa-solid fa-star text-cosmic-gold"></i> Astrological Signature
-        </h3>
-        <div class="grid grid-cols-2 gap-3 text-xs">
-          <div class="bg-cosmic-900/80 p-3 rounded-2xl border border-slate-800">
-            <span class="text-slate-400 text-[10px] block uppercase font-bold">Lagna (Ascendant)</span>
-            <span id="hlLagna" class="font-bold text-cosmic-gold text-sm font-serif-title">--</span>
-          </div>
-          <div class="bg-cosmic-900/80 p-3 rounded-2xl border border-slate-800">
-            <span class="text-slate-400 text-[10px] block uppercase font-bold">Janma Nakshatra</span>
-            <span id="hlNakshatra" class="font-bold text-amber-200 text-sm font-serif-title">--</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Right Column: Visual Chart & Detailed Interpretations (lg:col-span-8) -->
-    <section class="lg:col-span-8 space-y-6">
-      
-      <!-- Chart Display Card -->
-      <div class="bg-cosmic-800/90 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 backdrop-blur-xl">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-          <div class="flex items-center gap-2">
-            <i class="fa-solid fa-compass text-cosmic-gold"></i>
-            <h2 id="chartTitle" class="text-base font-bold font-serif-title text-slate-100">Lagna Chart (D1)</h2>
-          </div>
-
-          <div class="flex items-center gap-2 bg-cosmic-900 p-1 rounded-xl border border-slate-800 text-xs">
-            <button id="btnNorthStyle" class="px-3 py-1 rounded-lg font-bold bg-cosmic-gold text-cosmic-900">North Indian</button>
-            <button id="btnSouthStyle" class="px-3 py-1 rounded-lg font-bold text-slate-400 hover:text-slate-200">South Indian</button>
-          </div>
-        </div>
-
-        <div class="flex justify-center items-center py-2">
-          <div id="chartContainer" class="chart-container">
-            <!-- Dynamic SVG Chart Injected Here -->
-          </div>
-        </div>
-
-        <!-- House Inspector Output -->
-        <div id="houseInspector" class="p-3.5 rounded-2xl bg-purple-950/20 border border-amber-500/30 text-xs text-slate-300">
-          Click any house on the chart above to inspect occupants & rulers.
-        </div>
-      </div>
-
-      <!-- Tabbed Deep Analysis -->
-      <div class="bg-cosmic-800/90 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 backdrop-blur-xl">
-        <div class="flex border-b border-slate-800 gap-4 text-xs sm:text-sm font-semibold overflow-x-auto pb-1 scrollbar-none">
-          <button id="tabBtnPlanets" class="pb-2.5 border-b-2 border-cosmic-gold text-cosmic-gold font-bold whitespace-nowrap">1. Planetary Positions</button>
-          <button id="tabBtnDasha" class="pb-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap">2. Vimshottari Dashas</button>
-          <button id="tabBtnRashiphal" class="pb-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap">3. Rashiphal & Destiny</button>
-        </div>
-
-        <!-- Tab 1: Planetary Positions Table -->
-        <div id="tabPlanets" class="overflow-x-auto">
-          <table class="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr class="border-b border-slate-800 text-slate-400 font-semibold uppercase">
-                <th class="py-2.5 px-3">Planet</th>
-                <th class="py-2.5 px-3">Sign</th>
-                <th class="py-2.5 px-3">Degree</th>
-                <th class="py-2.5 px-3">Nakshatra (Pada)</th>
-                <th class="py-2.5 px-3">House</th>
-              </tr>
-            </thead>
-            <tbody id="planetaryTableBody" class="divide-y divide-slate-800/60 text-slate-200">
-              <!-- Rows added dynamically -->
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Tab 2: Dasha Timeline -->
-        <div id="tabDasha" class="hidden space-y-4">
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse text-xs">
-              <thead>
-                <tr class="border-b border-slate-800 text-slate-400 font-semibold uppercase">
-                  <th class="py-2.5 px-3">Mahadasha</th>
-                  <th class="py-2.5 px-3">Duration</th>
-                  <th class="py-2.5 px-3">Start Year</th>
-                  <th class="py-2.5 px-3">End Year</th>
-                  <th class="py-2.5 px-3">Status</th>
-                </tr>
-              </thead>
-              <tbody id="dashaTableBody" class="divide-y divide-slate-800/60 text-slate-200">
-                <!-- Dasha rows added dynamically -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Tab 3: Rashiphal Analysis -->
-        <div id="tabRashiphal" class="hidden space-y-6 text-xs sm:text-sm text-slate-300 leading-relaxed">
-          <div class="p-4 rounded-2xl bg-cosmic-900/80 border border-slate-800 space-y-2">
-            <h3 class="font-bold font-serif-title text-cosmic-gold text-sm flex items-center gap-2">
-              <i class="fa-solid fa-gem"></i> Core Planetary Profile
-            </h3>
-            <p id="rashiphalSummary">Generating personalized Vedic Rashiphal reading...</p>
-          </div>
-
-          <!-- MULTI-YEAR RASHIPHAL TIMELINE -->
-          <div class="space-y-4">
-            <div class="border-b border-slate-800 pb-2 flex items-center justify-between">
-              <h3 class="text-sm font-bold font-serif-title text-slate-100 flex items-center gap-2">
-                <i class="fa-solid fa-wand-magic-sparkles text-cosmic-gold"></i> Long-Term Rashiphal Timeline Forecast
-              </h3>
-              <span class="text-[10px] px-2.5 py-1 rounded-full bg-cosmic-gold/10 border border-cosmic-gold/30 text-cosmic-gold font-bold uppercase tracking-wider">
-                1Y • 5Y • 10Y Cycles
-              </span>
+    <!-- Header -->
+    <header class="border-b border-celestial-700/60 bg-celestial-800/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-celestial-600 border border-celestial-accent/50 flex items-center justify-center text-celestial-accent shadow-lg shadow-celestial-accent/10">
+                    <i class="fa-solid fa-om text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-cinzel text-xl font-bold gold-gradient-text tracking-wide">VEDIC RASHIPHAL CODEX</h1>
+                    <p class="text-xs text-slate-400">Multi-Horizon Forecast & Kundali Engine • Sidereal Lahiri</p>
+                </div>
             </div>
 
-            <!-- 1-YEAR HOROSCOPE -->
-            <div class="p-4 rounded-2xl bg-cosmic-900/90 border border-amber-500/30 space-y-3">
-              <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-                <span class="font-bold font-serif-title text-cosmic-gold text-xs flex items-center gap-2">
-                  <i class="fa-solid fa-hourglass-half text-cosmic-gold"></i> Next 1 Year Outlook (2026 – 2027)
+            <!-- Profile Badge & Actions -->
+            <div class="flex items-center space-x-3">
+                <span class="px-3 py-1 text-xs rounded-full bg-celestial-700 text-celestial-accentLight border border-celestial-600 font-medium flex items-center gap-1.5">
+                    <i class="fa-solid fa-user-astronaut"></i> Profile: <strong id="headerProfileName" class="gold-gradient-text font-semibold">Native</strong>
                 </span>
-                <span id="dashaPhase1" class="text-[10px] text-slate-400 bg-cosmic-700 px-2 py-0.5 rounded">Saturn–Ketu Dasha Phase</span>
-              </div>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                <div class="p-3 rounded-xl bg-cosmic-800/60 border border-slate-800 space-y-1">
-                  <span class="font-bold text-amber-300 block flex items-center gap-1">
-                    <i class="fa-solid fa-heart text-rose-400"></i> Love & Family Union
-                  </span>
-                  <p id="rashiphal1Love" class="text-[11px] leading-relaxed text-slate-300">
-                    Ketu transit brings introspection in emotional ties. Mutual patience is required. Avoid hasty decisions in relationships; existing bonds solidify after early 2027.
-                  </p>
-                </div>
-                <div class="p-3 rounded-xl bg-cosmic-800/60 border border-slate-800 space-y-1">
-                  <span class="font-bold text-amber-300 block flex items-center gap-1">
-                    <i class="fa-solid fa-sack-dollar text-amber-400"></i> Wealth & Financial Liquidity
-                  </span>
-                  <p id="rashiphal1Wealth" class="text-[11px] leading-relaxed text-slate-300">
-                    Consolidation period. Conserve capital, avoid unverified speculative investments, and focus on clearing pending dues or operational debts.
-                  </p>
-                </div>
-                <div class="p-3 rounded-xl bg-cosmic-800/60 border border-slate-800 space-y-1">
-                  <span class="font-bold text-amber-300 block flex items-center gap-1">
-                    <i class="fa-solid fa-chart-line text-emerald-400"></i> Job & Employment
-                  </span>
-                  <p id="rashiphal1Job" class="text-[11px] leading-relaxed text-slate-300">
-                    Workplace dynamics require structured patience. Avoid direct friction with senior authorities; leverage individual contributor strengths.
-                  </p>
-                </div>
-                <div class="p-3 rounded-xl bg-cosmic-800/60 border border-slate-800 space-y-1">
-                  <span class="font-bold text-amber-300 block flex items-center gap-1">
-                    <i class="fa-solid fa-briefcase text-cyan-400"></i> Business & Enterprise
-                  </span>
-                  <p id="rashiphal1Biz" class="text-[11px] leading-relaxed text-slate-300">
-                    Foundational groundwork period for independent ventures. Focus on establishing international agent networks and robust operating systems.
-                  </p>
-                </div>
-              </div>
+                <button onclick="window.print()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-celestial-700 hover:bg-celestial-600 border border-celestial-600 text-celestial-accent transition">
+                    <i class="fa-solid fa-print mr-1"></i> Export Report
+                </button>
             </div>
+        </div>
+    </header>
 
-            <!-- 5-YEAR HOROSCOPE -->
-            <div class="p-4 rounded-2xl bg-cosmic-900/90 border border-purple-500/30 space-y-3">
-              <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-                <span class="font-bold font-serif-title text-purple-300 text-xs flex items-center gap-2">
-                  <i class="fa-solid fa-calendar-days text-purple-400"></i> 5-Year Master Horizon (2027 – 2031)
-                </span>
-                <span id="dashaPhase5" class="text-[10px] text-slate-400 bg-cosmic-700 px-2 py-0.5 rounded">Saturn–Venus Rajayogakaraka Phase</span>
-              </div>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                <div class="p-3 rounded-xl bg-cosmic-800/60 border border-slate-800 space-y-1">
-                  <span class="font-bold text-amber-300 block flex items-center gap-1">
-                    <i class="fa-solid fa-heart text-rose-400"></i> Love & Relationship Expansion
-                  </span>
-                  <p id="rashiphal5Love" class="text-[11px] leading-relaxed text-slate-300">
-                    Venus Rajayogakaraka activates emotional and domestic dynamics. Harmony, mutual social prestige, and deep marital contentment experience a golden surge.
-                  </p>
-                </div>
-                <div class="p-3 rounded-xl bg-cosmic-800/60 border border-slate-800 space-y-1">
-                  <span class="font-bold text-amber-300 block flex items-center gap-1">
-                    <i class="fa-solid fa-coins text-amber-400"></i> Wealth Accumulation & Assets
-                  </span>
-                  <p id="rashiphal5Wealth" class="text-[11px] leading-relaxed text-slate-300">
-                    Major financial expansion window. Sustained effort yields steady asset acquisition, real estate stabilization, and high profit margins from core ventures.
-                  </p>
-                </div>
-                <div class="p-3 rounded-xl bg-cosmic-800/60 border border-slate-800 space-y-1">
-                  <span class="font-bold text-amber-300 block flex items-center gap-1">
-                    <i class="fa-solid fa-user-tie text-emerald-400"></i> Job & Corporate Standing
-                  </span>
-                  <p id="rashiphal5Job" class="text-[11px] leading-relaxed text-slate-300">
-                    Peak executive leadership potential. If in employment, rapid promotion into director/advisory tiers occurs naturally under Venus sub-period grace.
-                  </p>
-                </div>
-                <div class="p-3 rounded-xl bg-cosmic-800/60 border border-slate-800 space-y-1">
-                  <span class="font-bold text-amber-300 block flex items-center gap-1">
-                    <i class="fa-solid fa-globe text-cyan-400"></i> Business Scaling & Global Routes
-                  </span>
-                  <p id="rashiphal5Biz" class="text-[11px] leading-relaxed text-slate-300">
-                    Self-owned business ventures reach full operational maturity. Cross-border freight, logistics client pipelines, and brand recognition expand significantly.
-                  </p>
-                </div>
-              </div>
-            </div>
+    <!-- Main Dashboard Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 space-y-6">
 
-            <!-- 10-YEAR HOROSCOPE -->
-            <div class="p-4 rounded-2xl bg-cosmic-900/90 border border-emerald-500/30 space-y-3">
-              <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-                <span class="font-bold font-serif-title text-emerald-300 text-xs flex items-center gap-2">
-                  <i class="fa-solid fa-trophy text-emerald-400"></i> 10-Year Legacy & Transition (2031 – 2036+)
-                </span>
-                <span id="dashaPhase10" class="text-[10px] text-slate-400 bg-cosmic-700 px-2 py-0.5 rounded">Saturn to Mercury Mahadasha Era</span>
-              </div>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                <div class="p-3 rounded-xl bg-cosmic-800/60 border border-slate-800 space-y-1">
-                  <span class="font-bold text-amber-300 block flex items-center gap-1">
-                    <i class="fa-solid fa-house-chimney text-rose-400"></i> Family Legacy & Social Stature
-                  </span>
-                  <p id="rashiphal10Love" class="text-[11px] leading-relaxed text-slate-300">
-                    Solidification of family heritage. High respect within social circles, mentoring younger generations, and balanced domestic tranquility.
-                  </p>
-                </div>
-                <div class="p-3 rounded-xl bg-cosmic-800/60 border border-slate-800 space-y-1">
-                  <span class="font-bold text-amber-300 block flex items-center gap-1">
-                    <i class="fa-solid fa-vault text-amber-400"></i> Wealth Maturity & Abundance
-                  </span>
-                  <p id="rashiphal10Wealth" class="text-[11px] leading-relaxed text-slate-300">
-                    Financial independence fully achieved. Passive income streams, capital investments, and long-term portfolio security take precedence.
-                  </p>
-                </div>
-                <div class="p-3 rounded-xl bg-cosmic-800/60 border border-slate-800 space-y-1">
-                  <span class="font-bold text-amber-300 block flex items-center gap-1">
-                    <i class="fa-solid fa-award text-emerald-400"></i> Advisory & Senior Governance
-                  </span>
-                  <p id="rashiphal10Job" class="text-[11px] leading-relaxed text-slate-300">
-                    Shift from intense hands-on operational roles into strategic mentorship, executive board positions, and consultative governance.
-                  </p>
-                </div>
-                <div class="p-3 rounded-xl bg-cosmic-800/60 border border-slate-800 space-y-1">
-                  <span class="font-bold text-amber-300 block flex items-center gap-1">
-                    <i class="fa-solid fa-crown text-cyan-400"></i> Enterprise Ownership Mastery
-                  </span>
-                  <p id="rashiphal10Biz" class="text-[11px] leading-relaxed text-slate-300">
-                    Established business infrastructure runs with delegated leadership teams, allowing full personal autonomy and cosmic alignment.
-                  </p>
-                </div>
-              </div>
+        <!-- Birth Details Input Form Section -->
+        <section class="bg-celestial-800/90 border border-celestial-700 rounded-2xl p-5 shadow-2xl backdrop-blur-sm">
+            <div class="flex items-center justify-between mb-3 border-b border-celestial-700/60 pb-2.5">
+                <h3 class="font-cinzel font-bold text-celestial-accent text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-celestial-accent"></i> ENTER BIRTH DETAILS & NATIVE NAME (जन्म विवरण व नाम दर्ज करें)
+                </h3>
+                <button type="button" onclick="loadSamplePreset()" class="px-2.5 py-1 text-xs font-medium rounded-lg bg-celestial-700 hover:bg-celestial-600 border border-celestial-600 text-celestial-accentLight transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-rotate-left"></i> Reset Sample (09-Jan-1992)
+                </button>
             </div>
-          </div>
+            <form id="kundaliInputForm" onsubmit="handleBirthDetailsSubmit(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4 items-end">
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1"><i class="fa-solid fa-user text-celestial-accent mr-1"></i> Native Name</label>
+                    <input type="text" id="inputName" value="Sri Vikramaditya" placeholder="Enter Full Name" required class="w-full bg-celestial-900 border border-celestial-600 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-celestial-accent font-semibold">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1"><i class="fa-solid fa-calendar text-celestial-accent mr-1"></i> Date of Birth</label>
+                    <input type="date" id="inputDate" value="1992-01-09" required class="w-full bg-celestial-900 border border-celestial-600 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-celestial-accent">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1"><i class="fa-solid fa-clock text-celestial-accent mr-1"></i> Time of Birth (Local)</label>
+                    <input type="time" id="inputTime" step="1" value="14:30:00" required class="w-full bg-celestial-900 border border-celestial-600 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-celestial-accent">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1"><i class="fa-solid fa-globe text-celestial-accent mr-1"></i> Latitude (°N)</label>
+                    <input type="number" id="inputLat" step="0.0001" value="28.6139" required class="w-full bg-celestial-900 border border-celestial-600 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-celestial-accent">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1"><i class="fa-solid fa-location-dot text-celestial-accent mr-1"></i> Longitude (°E)</label>
+                    <input type="number" id="inputLon" step="0.0001" value="77.2090" required class="w-full bg-celestial-900 border border-celestial-600 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-celestial-accent">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1"><i class="fa-solid fa-stopwatch text-celestial-accent mr-1"></i> Timezone Offset (Hrs)</label>
+                    <input type="number" id="inputTz" step="0.1" value="5.5" required class="w-full bg-celestial-900 border border-celestial-600 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-celestial-accent">
+                </div>
+                <div>
+                    <button type="submit" class="w-full gold-button py-2.5 px-3 rounded-xl shadow-lg transition flex items-center justify-center gap-1.5 text-xs font-bold">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Compute Kundali
+                    </button>
+                </div>
+            </form>
+        </section>
 
-          <!-- VEDIC UPAYAS & REMEDIES -->
-          <div class="p-4 rounded-2xl bg-cosmic-900/80 border border-slate-800 space-y-2">
-            <h3 class="font-bold font-serif-title text-cosmic-gold text-sm flex items-center gap-2">
-              <i class="fa-solid fa-shield-halved text-cosmic-saffron"></i> Vedic Astrological Upayas & Remedial Guidelines
-            </h3>
-            <div id="upayasContainer" class="space-y-2 text-xs">
-              <p>• <strong>Metal Guidance:</strong> Wear pure Silver or Panchdhatu rings on the Right Hand. Avoid solid Gold rings on Saturn's finger (middle finger) to prevent maraka planet friction.</p>
-              <p>• <strong>Mantra Practice:</strong> Recite <em>Om Namah Shivaya</em> or <em>Mahamrityunjaya Mantra</em> 108 times daily during Saturn sub-periods.</p>
-              <p>• <strong>Charity & Upaya:</strong> Offer black sesame seeds, mustard oil, or food to the needy on Saturdays to pacify Shani.</p>
+        <!-- Active Transit Overview Grid -->
+        <section class="space-y-3">
+            <div class="flex items-center justify-between">
+                <h3 class="font-cinzel font-bold text-celestial-accent text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-arrows-spin"></i> LIVE MAJOR TRANSIT SNAPSHOTS (2026 – 2027)
+                </h3>
+                <span class="text-[11px] text-slate-400">Sidereal Lahiri Real-Time Positions</span>
             </div>
-          </div>
+            <div id="transitSnapshotGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- JS Populated Transit Cards -->
+            </div>
+        </section>
+
+        <!-- Navigation Tabs -->
+        <div class="border-b border-celestial-700/80 flex overflow-x-auto space-x-2 pb-1 scrollbar-none" id="mainTabContainer">
+            <button onclick="switchMainTab('codexView')" id="tab-codexView" class="tab-btn px-4 py-2 text-sm font-medium rounded-t-xl transition whitespace-nowrap bg-celestial-700 text-celestial-accent border-t border-x border-celestial-600">
+                <i class="fa-solid fa-scroll mr-1.5"></i> Rashiphal Codex (English / हिंदी)
+            </button>
+            <button onclick="switchMainTab('doshaYogaView')" id="tab-doshaYogaView" class="tab-btn px-4 py-2 text-sm font-medium rounded-t-xl transition whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-celestial-800/60">
+                <i class="fa-solid fa-shield-halved text-celestial-accent mr-1.5"></i> Dosha & Yoga Engine (दोष व योग)
+            </button>
+            <button onclick="switchMainTab('remediesView')" id="tab-remediesView" class="tab-btn px-4 py-2 text-sm font-medium rounded-t-xl transition whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-celestial-800/60">
+                <i class="fa-solid fa-gem text-amber-400 mr-1.5"></i> Gemstones & Remedies (रत्न व उपाय)
+            </button>
+            <button onclick="switchMainTab('d1View')" id="tab-d1View" class="tab-btn px-4 py-2 text-sm font-medium rounded-t-xl transition whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-celestial-800/60">
+                <i class="fa-solid fa-sun mr-1.5"></i> D-1 Rashi & Planets
+            </button>
+            <button onclick="switchMainTab('d9View')" id="tab-d9View" class="tab-btn px-4 py-2 text-sm font-medium rounded-t-xl transition whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-celestial-800/60">
+                <i class="fa-solid fa-star-of-david mr-1.5"></i> D-9 Navamsha
+            </button>
+            <button onclick="switchMainTab('d10View')" id="tab-d10View" class="tab-btn px-4 py-2 text-sm font-medium rounded-t-xl transition whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-celestial-800/60">
+                <i class="fa-solid fa-briefcase mr-1.5"></i> D-10 Dashamsha (Career)
+            </button>
+            <button onclick="switchMainTab('chalitView')" id="tab-chalitView" class="tab-btn px-4 py-2 text-sm font-medium rounded-t-xl transition whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-celestial-800/60">
+                <i class="fa-solid fa-compass mr-1.5"></i> Bhava Chalit
+            </button>
+            <button onclick="switchMainTab('dashaView')" id="tab-dashaView" class="tab-btn px-4 py-2 text-sm font-medium rounded-t-xl transition whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-celestial-800/60">
+                <i class="fa-solid fa-hourglass-half mr-1.5"></i> 5-Tier Vimshottari Dasha
+            </button>
+            <button onclick="switchMainTab('ashtakavargaView')" id="tab-ashtakavargaView" class="tab-btn px-4 py-2 text-sm font-medium rounded-t-xl transition whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-celestial-800/60">
+                <i class="fa-solid fa-table-cells mr-1.5"></i> Ashtakavarga & Shodhya
+            </button>
+            <button onclick="switchMainTab('gocharView')" id="tab-gocharView" class="tab-btn px-4 py-2 text-sm font-medium rounded-t-xl transition whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-celestial-800/60">
+                <i class="fa-solid fa-arrows-spin mr-1.5"></i> Transit Gochar
+            </button>
         </div>
 
-      </div>
+        <!-- MAIN TAB CONTENTS -->
+        <div id="mainViewsContainer" class="min-h-[520px]">
 
-    </section>
-  </main>
+            <!-- TAB: RASHIPHAL CODEX FORECASTS -->
+            <div id="codexView" class="tab-content space-y-6">
+                <!-- Horizon Selection Bar -->
+                <div class="flex items-center justify-between bg-celestial-800/60 border border-celestial-700/80 rounded-xl p-3">
+                    <span class="text-xs font-cinzel font-bold text-celestial-accent"><i class="fa-solid fa-timeline mr-1"></i> SELECT FORECAST HORIZON / समय क्षितिज:</span>
+                    <div class="flex space-x-2">
+                        <button onclick="switchHorizon('1Y')" id="btn-horizon-1Y" class="px-3 py-1.5 text-xs font-bold rounded-xl bg-celestial-700 text-celestial-accent border border-celestial-600">1-Year (2026-2027)</button>
+                        <button onclick="switchHorizon('5Y')" id="btn-horizon-5Y" class="px-3 py-1.5 text-xs font-medium rounded-xl text-slate-400 hover:text-slate-200">5-Year (2026-2031)</button>
+                        <button onclick="switchHorizon('10Y')" id="btn-horizon-10Y" class="px-3 py-1.5 text-xs font-medium rounded-xl text-slate-400 hover:text-slate-200">10-Year (2026-2036)</button>
+                    </div>
+                </div>
 
-  <footer class="border-t border-slate-800 py-6 bg-[#0B0D1B] text-center text-xs text-slate-500">
-    <p>Client-Side Vedic Sidereal Engine • Lahiri Ayanamsha • Ready for Free Static Hosting</p>
-  </footer>
+                <!-- Forecast Cards Horizon Containers -->
+                <div id="card-horizon-1Y" class="space-y-4">
+                    <div class="bg-celestial-800/90 border border-celestial-700 rounded-2xl p-6 shadow-xl space-y-3">
+                        <div class="flex items-center justify-between border-b border-celestial-700/80 pb-2">
+                            <h4 class="font-cinzel font-bold text-celestial-accent text-base"><i class="fa-solid fa-briefcase text-amber-400 mr-2"></i> Career & Enterprise (करियर एवं उद्योग)</h4>
+                            <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40">Strong Expansion / उच्च विकास</span>
+                        </div>
+                        <p class="text-xs text-slate-200 leading-relaxed">Transition from corporate roles into autonomous international ventures. 12th House Rahu activation opens cross-border routes, ocean logistics, and overseas partnerships.</p>
+                        <p class="text-xs text-amber-200/80 leading-relaxed font-sans pt-1 border-t border-celestial-700/50">कॉर्पोरेट भूमिकाओं से निकलकर स्वतंत्र अंतर्राष्ट्रीय व्यवसाय में कदम। द्वादश भाव में राहु का प्रभाव विदेशी व्यापार, समुद्री लॉजिस्टिक्स एवं ओवरसीज़ साझेदारी का मार्ग प्रशस्त करता है।</p>
+                    </div>
+                    <div class="bg-celestial-800/90 border border-celestial-700 rounded-2xl p-6 shadow-xl space-y-3">
+                        <div class="flex items-center justify-between border-b border-celestial-700/80 pb-2">
+                            <h4 class="font-cinzel font-bold text-celestial-accent text-base"><i class="fa-solid fa-coins text-emerald-400 mr-2"></i> Wealth & Finance (धन एवं संपत्ति)</h4>
+                            <span class="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40">Turning Point May 2027 / मई 2027 से परिवर्तन</span>
+                        </div>
+                        <p class="text-xs text-slate-200 leading-relaxed">Financial consolidation occurs as Sade Sati concludes in May 2027. Multiple revenue streams initiate after age 35 threshold, backed by Guru-Mangala Yoga.</p>
+                        <p class="text-xs text-amber-200/80 leading-relaxed font-sans pt-1 border-t border-celestial-700/50">मई 2027 में साढ़े साती के समापन के साथ वित्तीय स्थिरता प्राप्त होगी। गुरु-मंगल योग के प्रभाव से 35 वर्ष के पश्चात आय के अनेक स्रोत खुलेंगे।</p>
+                    </div>
+                </div>
 
-  <script>
-    // --- ASTROLOGICAL CONSTANTS ---
-    const SIGNS = [
-      { name: "Aries", sanskrit: "Mesha", ruler: "Mars" },
-      { name: "Taurus", sanskrit: "Vrishabha", ruler: "Venus" },
-      { name: "Gemini", sanskrit: "Mithuna", ruler: "Mercury" },
-      { name: "Cancer", sanskrit: "Karka", ruler: "Moon" },
-      { name: "Leo", sanskrit: "Simha", ruler: "Sun" },
-      { name: "Virgo", sanskrit: "Kanya", ruler: "Mercury" },
-      { name: "Libra", sanskrit: "Tula", ruler: "Venus" },
-      { name: "Scorpio", sanskrit: "Vrishchika", ruler: "Mars" },
-      { name: "Sagittarius", sanskrit: "Dhanu", ruler: "Jupiter" },
-      { name: "Capricorn", sanskrit: "Makara", ruler: "Saturn" },
-      { name: "Aquarius", sanskrit: "Kumbha", ruler: "Saturn" },
-      { name: "Pisces", sanskrit: "Meena", ruler: "Jupiter" }
-    ];
+                <div id="card-horizon-5Y" class="hidden space-y-4">
+                    <div class="bg-celestial-800/90 border border-celestial-700 rounded-2xl p-6 shadow-xl space-y-3">
+                        <div class="flex items-center justify-between border-b border-celestial-700/80 pb-2">
+                            <h4 class="font-cinzel font-bold text-celestial-accent text-base"><i class="fa-solid fa-rocket text-purple-400 mr-2"></i> 5-Year Master Horizon (5-वर्षीय महा-क्षितिज 2026–2031)</h4>
+                            <span class="text-xs px-2.5 py-0.5 rounded-full bg-celestial-purple text-white font-bold">Saturn-Jupiter Activation / शनि-गुरु अंतर्दशा</span>
+                        </div>
+                        <p class="text-xs text-slate-200 leading-relaxed">The 2029–2031 period marks the peak harvest phase of the chart. Guru-Mangala Yoga in the 9th house fires completely, establishing institutional network infrastructure across international hubs.</p>
+                        <p class="text-xs text-amber-200/80 leading-relaxed font-sans pt-1 border-t border-celestial-700/50">वर्ष 2029 से 2031 की अवधि कुंडली का मुख्य फलदायी चरण है। नवम भाव में स्थित गुरु-मंगल योग पूर्ण सक्रिय होकर अंतर्राष्ट्रीय केंद्रों में व्यापक नेटवर्क स्थापित करेगा।</p>
+                    </div>
+                </div>
 
-    const NAKSHATRAS = [
-      { name: "Ashwini", lord: "Ketu" }, { name: "Bharani", lord: "Venus" }, { name: "Krittika", lord: "Sun" },
-      { name: "Rohini", lord: "Moon" }, { name: "Mrigashira", lord: "Mars" }, { name: "Ardra", lord: "Rahu" },
-      { name: "Punarvasu", lord: "Jupiter" }, { name: "Pushya", lord: "Saturn" }, { name: "Ashlesha", lord: "Mercury" },
-      { name: "Magha", lord: "Ketu" }, { name: "Purva Phalguni", lord: "Venus" }, { name: "Uttara Phalguni", lord: "Sun" },
-      { name: "Hasta", lord: "Moon" }, { name: "Chitra", lord: "Mars" }, { name: "Swati", lord: "Rahu" },
-      { name: "Vishakha", lord: "Jupiter" }, { name: "Anuradha", lord: "Saturn" }, { name: "Jyeshtha", lord: "Mercury" },
-      { name: "Mula", lord: "Ketu" }, { name: "Purva Ashadha", lord: "Venus" }, { name: "Uttara Ashadha", lord: "Sun" },
-      { name: "Shravana", lord: "Moon" }, { name: "Dhanishta", lord: "Mars" }, { name: "Shatabhisha", lord: "Rahu" },
-      { name: "Purva Bhadrapada", lord: "Jupiter" }, { name: "Uttara Bhadrapada", lord: "Saturn" }, { name: "Revati", lord: "Mercury" }
-    ];
+                <div id="card-horizon-10Y" class="hidden space-y-4">
+                    <div class="bg-celestial-800/90 border border-celestial-700 rounded-2xl p-6 shadow-xl space-y-3">
+                        <div class="flex items-center justify-between border-b border-celestial-700/80 pb-2">
+                            <h4 class="font-cinzel font-bold text-celestial-accent text-base"><i class="fa-solid fa-crown text-celestial-accent mr-2"></i> 10-Year Legacy Horizon (10-वर्षीय दीर्घकालिक क्षितिज 2026–2036)</h4>
+                            <span class="text-xs px-2.5 py-0.5 rounded-full bg-celestial-accent text-celestial-900 font-bold">Shasha Mahapurusha Peak / शश महापुरुष योग शिखर</span>
+                        </div>
+                        <p class="text-xs text-slate-200 leading-relaxed">Shasha Mahapurusha Yoga native reaches maximum structural authority in late 30s and 40s. Complete transition into industry expertise and long-term asset building.</p>
+                        <p class="text-xs text-amber-200/80 leading-relaxed font-sans pt-1 border-t border-celestial-700/50">शश महापुरुष योग धारक 30 के दशक के उत्तरार्ध एवं 40 के दशक में सर्वोच्च प्रशासनिक अधिकार प्राप्त करता है। दीर्घकालिक परिसंपत्ति निर्माण की पूर्णता।</p>
+                    </div>
+                </div>
+            </div>
 
-    const DASHA_YEARS = { "Ketu": 7, "Venus": 20, "Sun": 6, "Moon": 10, "Mars": 7, "Rahu": 18, "Jupiter": 16, "Saturn": 19, "Mercury": 17 };
-    const DASHA_ORDER = ["Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"];
+            <!-- TAB: DOSHA & YOGA ANALYSIS ENGINE -->
+            <div id="doshaYogaView" class="tab-content hidden space-y-6">
+                <div class="bg-celestial-800/90 border border-celestial-accent/40 rounded-2xl p-6 shadow-2xl space-y-5">
+                    <div class="border-b border-celestial-700/80 pb-3">
+                        <h3 class="font-cinzel font-bold gold-gradient-text text-lg flex items-center gap-2">
+                            <i class="fa-solid fa-shield-cat"></i> VEDIC DOSHA EVALUATION (कुंडली दोष परीक्षण)
+                        </h3>
+                        <p class="text-xs text-slate-400">Algorithmic detection of classical afflictions based on Lagna, Moon, and planetary inter-aspects.</p>
+                    </div>
+                    <div id="doshaCardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                </div>
 
-    const d2r = d => d * Math.PI / 180;
-    const r2d = r => r * 180 / Math.PI;
-    const norm360 = d => (d % 360 + 360) % 360;
+                <div class="bg-celestial-800/90 border border-celestial-700 rounded-2xl p-6 shadow-2xl space-y-5">
+                    <div class="border-b border-celestial-700/80 pb-3">
+                        <h3 class="font-cinzel font-bold text-celestial-accent text-lg flex items-center gap-2">
+                            <i class="fa-solid fa-crown"></i> BENEVOLENT RAJA & DHANA YOGAS (शुभ राजयोग एवं योग)
+                        </h3>
+                        <p class="text-xs text-slate-400">Panch Mahapurusha Yogas, Kendra-Trikona Lord Combos, and Lunar/Solar Auspicious Formations.</p>
+                    </div>
+                    <div id="yogaCardsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                </div>
+            </div>
 
-    function getJulianDay(year, month, day, hours) {
-      if (month <= 2) { year -= 1; month += 12; }
-      const A = Math.floor(year / 100);
-      const B = 2 - A + Math.floor(A / 4);
-      return Math.floor(365.25 * (year + 4716)) + Math.floor(30.6001 * (month + 1)) + day + B - 1524.5 + (hours / 24.0);
-    }
+            <!-- TAB: GEMSTONES & REMEDIES -->
+            <div id="remediesView" class="tab-content hidden space-y-6">
+                <div class="bg-celestial-800/90 border border-celestial-700 rounded-2xl p-6 shadow-2xl space-y-5">
+                    <div class="border-b border-celestial-700/80 pb-3">
+                        <h3 class="font-cinzel font-bold text-celestial-accent text-lg flex items-center gap-2">
+                            <i class="fa-solid fa-gem text-amber-400"></i> PRESCRIPTIVE GEMSTONES & VEDIC REMEDIES (रत्न व आध्यात्मिक उपाय)
+                        </h3>
+                        <p class="text-xs text-slate-400">Tailored gemstone advice based on Lagna, Bhagya, and active Dasha lords.</p>
+                    </div>
+                    <div id="gemstoneCardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                </div>
+            </div>
 
-    function getLahiriAyanamsha(jd) {
-      const T = (jd - 2451545.0) / 36525.0;
-      return 23.85 + ((50.290966 * T * 100 + 0.0222222 * T * T * 100) / 3600.0);
-    }
+            <!-- TAB 1: D-1 RASHI & GRAHA TABLE -->
+            <div id="d1View" class="tab-content hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-5 bg-celestial-800/80 border border-celestial-700 rounded-2xl p-4 flex flex-col items-center justify-center shadow-xl">
+                    <h3 class="font-cinzel font-bold text-celestial-accent text-center mb-1">D-1 RASHI KUNDALI</h3>
+                    <p class="text-[11px] text-slate-400 mb-3">Primary Sidereal Birth Chart</p>
+                    <div id="svgD1ChartContainer" class="w-full max-w-[360px] aspect-square min-h-[300px]"></div>
+                </div>
+                <div class="lg:col-span-7 bg-celestial-800/80 border border-celestial-700 rounded-2xl p-4 shadow-xl overflow-x-auto">
+                    <h3 class="font-cinzel font-bold text-celestial-accent mb-3">SIDEREAL PLANETARY POSITIONS</h3>
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-celestial-900 text-celestial-accent uppercase font-cinzel border-b border-celestial-700">
+                            <tr>
+                                <th class="p-2.5">Body</th>
+                                <th class="p-2.5">Sign (Rashi)</th>
+                                <th class="p-2.5">In-Sign Pos</th>
+                                <th class="p-2.5">House</th>
+                                <th class="p-2.5">Nakshatra (Pada)</th>
+                                <th class="p-2.5">Dignity</th>
+                            </tr>
+                        </thead>
+                        <tbody id="d1GrahaTableBody" class="divide-y divide-celestial-700/50"></tbody>
+                    </table>
+                </div>
+            </div>
 
-    function computePositions(jd, lat, lon) {
-      const D = jd - 2451545.0;
-      const T = D / 36525.0;
-      const ayanamsha = getLahiriAyanamsha(jd);
+            <!-- TAB: D-10 DASHAMSHA (CAREER) CHART -->
+            <div id="d10View" class="tab-content hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-5 bg-celestial-800/80 border border-celestial-700 rounded-2xl p-4 flex flex-col items-center justify-center shadow-xl">
+                    <h3 class="font-cinzel font-bold text-celestial-accent text-center mb-1">D-10 DASHAMSHA CHART</h3>
+                    <p class="text-[11px] text-slate-400 mb-3">Varga for Profession, Power, & Achievements</p>
+                    <div id="svgD10ChartContainer" class="w-full max-w-[360px] aspect-square min-h-[300px]"></div>
+                </div>
+                <div class="lg:col-span-7 bg-celestial-800/80 border border-celestial-700 rounded-2xl p-4 shadow-xl overflow-x-auto">
+                    <h3 class="font-cinzel font-bold text-celestial-accent mb-3">D-10 DIVISIONAL POSITIONS</h3>
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-celestial-900 text-celestial-accent uppercase font-cinzel border-b border-celestial-700">
+                            <tr>
+                                <th class="p-2.5">Body</th>
+                                <th class="p-2.5">D-1 Sign</th>
+                                <th class="p-2.5">D-10 Sign</th>
+                                <th class="p-2.5">D-10 House</th>
+                                <th class="p-2.5">D-10 Dignity</th>
+                            </tr>
+                        </thead>
+                        <tbody id="d10GrahaTableBody" class="divide-y divide-celestial-700/50"></tbody>
+                    </table>
+                </div>
+            </div>
 
-      const Sun_L = norm360(280.46646 + 36000.76983 * T);
-      const Sun_M = norm360(357.52911 + 35999.05029 * T);
-      const Sun_EqC = 1.914602 * Math.sin(d2r(Sun_M)) + 0.019993 * Math.sin(d2r(2 * Sun_M));
-      const Sun_True = norm360(Sun_L + Sun_EqC);
+            <!-- TAB 3: D-9 NAVAMSHA CHART -->
+            <div id="d9View" class="tab-content hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-5 bg-celestial-800/80 border border-celestial-700 rounded-2xl p-4 flex flex-col items-center justify-center shadow-xl">
+                    <h3 class="font-cinzel font-bold text-celestial-accent text-center mb-1">D-9 NAVAMSHA CHART</h3>
+                    <p class="text-[11px] text-slate-400 mb-3">Dharma, Marriage & Inner Strength Varga</p>
+                    <div id="svgD9ChartContainer" class="w-full max-w-[360px] aspect-square min-h-[300px]"></div>
+                </div>
+                <div class="lg:col-span-7 bg-celestial-800/80 border border-celestial-700 rounded-2xl p-4 shadow-xl overflow-x-auto">
+                    <h3 class="font-cinzel font-bold text-celestial-accent mb-3">NAVAMSHA DIVISION & VARGOTTAMA</h3>
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-celestial-900 text-celestial-accent uppercase font-cinzel border-b border-celestial-700">
+                            <tr>
+                                <th class="p-2.5">Body</th>
+                                <th class="p-2.5">D-1 Sign</th>
+                                <th class="p-2.5">Navamsha Pada</th>
+                                <th class="p-2.5">D-9 Sign</th>
+                                <th class="p-2.5">D-9 House</th>
+                                <th class="p-2.5">D-9 Dignity</th>
+                                <th class="p-2.5">Vargottama</th>
+                            </tr>
+                        </thead>
+                        <tbody id="d9GrahaTableBody" class="divide-y divide-celestial-700/50"></tbody>
+                    </table>
+                </div>
+            </div>
 
-      const Moon_L = norm360(218.3165 + 481267.8813 * T);
-      const Moon_M = norm360(134.9634 + 477198.8676 * T);
-      const Moon_F = norm360(93.2721 + 483202.0175 * T);
-      const Moon_D = norm360(297.8502 + 445267.2217 * T);
-      const Moon_EqC = 6.2886 * Math.sin(d2r(Moon_M)) + 1.2740 * Math.sin(d2r(2 * Moon_D - Moon_M)) + 0.6583 * Math.sin(d2r(2 * Moon_D));
-      const Moon_True = norm360(Moon_L + Moon_EqC);
+            <!-- TAB BHAVA CHALIT -->
+            <div id="chalitView" class="tab-content hidden space-y-6">
+                <div class="bg-celestial-800/80 border border-celestial-700 rounded-2xl p-5 shadow-xl">
+                    <div class="mb-4">
+                        <h3 class="font-cinzel font-bold text-celestial-accent text-lg">BHAVA CHALIT & CUSPAL ANALYSIS</h3>
+                        <p class="text-xs text-slate-400">Midpoint-Bounded House System (Porphyry Cusps Baseline)</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="overflow-x-auto">
+                            <h4 class="text-xs font-bold font-cinzel text-celestial-accentLight uppercase mb-2">Sidereal House Cusps</h4>
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-celestial-900 text-celestial-accent uppercase border-b border-celestial-700">
+                                    <tr>
+                                        <th class="p-2">House</th>
+                                        <th class="p-2">Sign</th>
+                                        <th class="p-2">Cusp Degree</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="houseCuspsTableBody" class="divide-y divide-celestial-700/50"></tbody>
+                            </table>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <h4 class="text-xs font-bold font-cinzel text-celestial-accentLight uppercase mb-2">Whole Sign vs. Chalit Shift</h4>
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-celestial-900 text-celestial-accent uppercase border-b border-celestial-700">
+                                    <tr>
+                                        <th class="p-2">Body</th>
+                                        <th class="p-2">Whole H</th>
+                                        <th class="p-2">Chalit H</th>
+                                        <th class="p-2">Δ Offset</th>
+                                        <th class="p-2">Shifted?</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="chalitShiftTableBody" class="divide-y divide-celestial-700/50"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-      const Rahu_True = norm360(125.04452 - 1934.136261 * T);
-      const Ketu_True = norm360(Rahu_True + 180);
+            <!-- TAB 4: 5-TIER VIMSHOTTARI DASHA EXPLORER -->
+            <div id="dashaView" class="tab-content hidden space-y-6">
+                <div class="bg-celestial-800/90 border border-celestial-accent/40 rounded-2xl p-5 shadow-xl">
+                    <h3 class="font-cinzel font-bold gold-gradient-text text-base mb-2">5-TIER VIMSHOTTARI PERIOD RESOLVER</h3>
+                    <p class="text-xs text-slate-400 mb-4">Select any date to resolve active periods down to Prana Dasha level.</p>
+                    <div class="flex flex-wrap items-center gap-3 mb-4">
+                        <input type="datetime-local" id="dashaTargetDate" class="bg-celestial-900 border border-celestial-600 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-celestial-accent">
+                        <button onclick="setDashaToday()" class="px-3 py-2 text-xs font-semibold rounded-xl bg-celestial-700 hover:bg-celestial-600 text-celestial-accent border border-celestial-600">
+                            <i class="fa-solid fa-calendar-day mr-1"></i> Current Date (Today)
+                        </button>
+                        <button onclick="lookupDashaDate()" class="gold-button px-4 py-2 rounded-xl text-xs font-bold shadow-md">
+                            <i class="fa-solid fa-magnifying-glass mr-1"></i> Resolve Period
+                        </button>
+                    </div>
+                    <div id="activeDashaCard" class="hidden bg-celestial-900/90 border border-celestial-700 rounded-xl p-4 grid grid-cols-1 sm:grid-cols-5 gap-3 text-center"></div>
+                </div>
 
-      const Mars_Long = norm360(355.4533 + 19140.3026 * T + 0.77 * Math.sin(d2r(Sun_M)));
-      const Mercury_Long = norm360(Sun_True + 22.5 * Math.sin(d2r(norm360(252.25 + 149472.67 * T))));
-      const Jupiter_Long = norm360(34.4044 + 3034.7530 * T + 4.5 * Math.sin(d2r(norm360(Moon_M))));
-      const Venus_Long = norm360(Sun_True + 40.0 * Math.sin(d2r(norm360(181.98 + 58517.81 * T))));
-      const Saturn_Long = norm360(49.9443 + 1222.1138 * T + 3.2 * Math.sin(d2r(norm360(2 * Sun_M))));
+                <div class="bg-celestial-800/80 border border-celestial-700 rounded-2xl p-5 shadow-xl">
+                    <div id="dashaBalanceHeader" class="mb-4 text-sm text-slate-300 border-b border-celestial-700/80 pb-3"></div>
+                    <h4 class="font-cinzel font-bold text-celestial-accent text-sm mb-3">120-YEAR VIMSHOTTARI MAHADASHA SEQUENCE</h4>
+                    <div id="mahadashaAccordion" class="space-y-3"></div>
+                </div>
+            </div>
 
-      const GMST0 = norm360(280.46061837 + 360.98564736629 * D);
-      const RAMC = norm360(GMST0 + lon);
-      const eps = 23.4392911;
+            <!-- TAB 5: ASHTAKAVARGA & SHODHYA PINDA -->
+            <div id="ashtakavargaView" class="tab-content hidden space-y-6">
+                <div class="bg-celestial-800/80 border border-celestial-700 rounded-2xl p-5 shadow-xl space-y-6">
+                    <h3 class="font-cinzel font-bold text-celestial-accent text-lg">BHINNASHTAKAVARGA (BAV) & SHODHANA REDUCTIONS</h3>
+                    
+                    <div class="flex space-x-2 border-b border-celestial-700 pb-2">
+                        <button onclick="switchAvTable('raw')" id="btn-av-raw" class="px-3 py-1 text-xs font-semibold rounded-lg bg-celestial-700 text-celestial-accent">Raw BAV & SAV</button>
+                        <button onclick="switchAvTable('trikona')" id="btn-av-trikona" class="px-3 py-1 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-200">After Trikona Shodhana</button>
+                        <button onclick="switchAvTable('final')" id="btn-av-final" class="px-3 py-1 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-200">After Ekadhipatya (Final)</button>
+                    </div>
 
-      const num = Math.cos(d2r(RAMC));
-      const den = -(Math.sin(d2r(RAMC)) * Math.cos(d2r(eps)) + Math.tan(d2r(lat)) * Math.sin(d2r(eps)));
-      let ascTropical = norm360(r2d(Math.atan2(num, den)));
-      let ascSidereal = norm360(ascTropical - ayanamsha);
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-center text-xs">
+                            <thead class="bg-celestial-900 text-celestial-accent uppercase font-cinzel border-b border-celestial-700">
+                                <tr id="avTableHeaderRow">
+                                    <th class="p-2 text-left">Planet</th>
+                                    <th class="p-2">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="avTableBody" class="divide-y divide-celestial-700/50"></tbody>
+                        </table>
+                    </div>
 
-      return {
-        Lagna: ascSidereal,
-        Sun: norm360(Sun_True - ayanamsha),
-        Moon: norm360(Moon_True - ayanamsha),
-        Mars: norm360(Mars_Long - ayanamsha),
-        Mercury: norm360(Mercury_Long - ayanamsha),
-        Jupiter: norm360(Jupiter_Long - ayanamsha),
-        Venus: norm360(Venus_Long - ayanamsha),
-        Saturn: norm360(Saturn_Long - ayanamsha),
-        Rahu: norm360(Rahu_True - ayanamsha),
-        Ketu: norm360(Ketu_True - ayanamsha)
-      };
-    }
+                    <div class="border-t border-celestial-700/80 pt-5">
+                        <h4 class="font-cinzel font-bold text-celestial-accentLight text-sm mb-3">SHODHYA PINDA (POST-SHODHANA STRENGTH)</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-celestial-900 text-celestial-accent uppercase font-cinzel border-b border-celestial-700">
+                                    <tr>
+                                        <th class="p-2.5">Planet</th>
+                                        <th class="p-2.5">Final Post-Shodhana Bindus</th>
+                                        <th class="p-2.5">Rashi Pinda</th>
+                                        <th class="p-2.5">Graha Pinda</th>
+                                        <th class="p-2.5">Shodhya Pinda Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="shodhyaPindaTableBody" class="divide-y divide-celestial-700/50"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    // STATE
-    let currentData = null;
-    let chartStyle = "north";
+            <!-- TAB 6: TRANSIT GOCHAR HELPER -->
+            <div id="gocharView" class="tab-content hidden space-y-6">
+                <div class="bg-celestial-800/80 border border-celestial-700 rounded-2xl p-5 shadow-xl space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-4 border-b border-celestial-700 pb-4">
+                        <div>
+                            <h3 class="font-cinzel font-bold text-celestial-accent text-lg">TRANSIT (GOCHAR) EVALUATOR</h3>
+                            <p class="text-xs text-slate-400">Evaluates transiting planets against your natal BAV & SAV bindu points.</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <input type="date" id="gocharInputDate" value="2026-11-25" class="bg-celestial-900 border border-celestial-600 rounded-xl px-3 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-celestial-accent">
+                            <button onclick="evaluateGochar()" class="gold-button px-3 py-1.5 rounded-xl text-xs font-bold">
+                                Evaluate Transit
+                            </button>
+                        </div>
+                    </div>
 
-    // DOM ELEMENTS
-    const kundaliForm = document.getElementById('kundaliForm');
-    const cityNameInput = document.getElementById('cityNameInput');
-    const btnSearchCity = document.getElementById('btnSearchCity');
-    const citySearchResults = document.getElementById('citySearchResults');
-    const chartContainer = document.getElementById('chartContainer');
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-celestial-900 text-celestial-accent uppercase font-cinzel border-b border-celestial-700">
+                                <tr>
+                                    <th class="p-2.5">Planet</th>
+                                    <th class="p-2.5">Transit Sign</th>
+                                    <th class="p-2.5">In-Sign Deg</th>
+                                    <th class="p-2.5">H (Lagna)</th>
+                                    <th class="p-2.5">H (Moon)</th>
+                                    <th class="p-2.5">Own Natal BAV</th>
+                                    <th class="p-2.5">Natal SAV in Sign</th>
+                                    <th class="p-2.5">Strength Assessment</th>
+                                </tr>
+                            </thead>
+                            <tbody id="gocharTableBody" class="divide-y divide-celestial-700/50"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-    // NOMINATIM GEOLOCATION SEARCH
-    let searchDebounce = null;
-    cityNameInput.addEventListener('input', (e) => {
-      const q = e.target.value.trim();
-      if (q.length < 3) {
-        citySearchResults.classList.add('hidden');
-        return;
-      }
-      clearTimeout(searchDebounce);
-      searchDebounce = setTimeout(async () => {
-        try {
-          const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=4`);
-          const results = await res.json();
-          if (results.length > 0) {
-            citySearchResults.innerHTML = results.map(r => `
-              <div onclick="selectCity('${r.display_name.replace(/'/g, "\\'")}', ${r.lat}, ${r.lon})" class="p-2 hover:bg-slate-800 cursor-pointer text-slate-200 border-b border-slate-800/60 truncate">
-                ${r.display_name}
-              </div>
-            `).join('');
-            citySearchResults.classList.remove('hidden');
-          }
-        } catch(err) { console.error(err); }
-      }, 400);
-    });
+        </div>
+    </main>
 
-    function selectCity(name, lat, lon) {
-      cityNameInput.value = name;
-      document.getElementById('latitude').value = parseFloat(lat).toFixed(4);
-      document.getElementById('longitude').value = parseFloat(lon).toFixed(4);
-      document.getElementById('tzOffset').value = (Math.round((lon / 15) * 2) / 2).toFixed(1);
-      citySearchResults.classList.add('hidden');
-    }
+    <footer class="border-t border-celestial-700/60 bg-celestial-900/90 py-4 text-center text-xs text-slate-500 mt-auto">
+        <p>© 2026 Vedic Rashiphal Codex • Sidereal Lahiri Astrological Engine</p>
+    </footer>
 
-    // FORM SUBMIT
-    kundaliForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      calculateChart();
-    });
+    <!-- JAVASCRIPT ENGINE & LOGIC -->
+    <script>
+        // =========================================================================
+        // CONSTANTS & TABLES
+        // =========================================================================
+        const RASHIS = [
+            "Aries (Mesha)", "Taurus (Vrishabha)", "Gemini (Mithuna)", "Cancer (Karka)",
+            "Leo (Simha)", "Virgo (Kanya)", "Libra (Tula)", "Scorpio (Vrishchika)",
+            "Sagittarius (Dhanu)", "Capricorn (Makara)", "Aquarius (Kumbha)", "Pisces (Meena)"
+        ];
 
-    // CHART STYLE TOGGLES
-    document.getElementById('btnNorthStyle').addEventListener('click', () => {
-      chartStyle = 'north';
-      document.getElementById('btnNorthStyle').className = 'px-3 py-1 rounded-lg font-bold bg-cosmic-gold text-cosmic-900';
-      document.getElementById('btnSouthStyle').className = 'px-3 py-1 rounded-lg font-bold text-slate-400 hover:text-slate-200';
-      if (currentData) renderChartSVG();
-    });
+        const GRAHA_NAMES = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+        const ASHTAKAVARGA_PLANETS = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
+        const ASHTAKAVARGA_CONTRIBUTORS = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Lagna"];
 
-    document.getElementById('btnSouthStyle').addEventListener('click', () => {
-      chartStyle = 'south';
-      document.getElementById('btnSouthStyle').className = 'px-3 py-1 rounded-lg font-bold bg-cosmic-gold text-cosmic-900';
-      document.getElementById('btnNorthStyle').className = 'px-3 py-1 rounded-lg font-bold text-slate-400 hover:text-slate-200';
-      if (currentData) renderChartSVG();
-    });
-
-    // TABS
-    document.getElementById('tabBtnPlanets').addEventListener('click', () => {
-      document.getElementById('tabPlanets').classList.remove('hidden');
-      document.getElementById('tabDasha').classList.add('hidden');
-      document.getElementById('tabRashiphal').classList.add('hidden');
-      document.getElementById('tabBtnPlanets').className = 'pb-2.5 border-b-2 border-cosmic-gold text-cosmic-gold font-bold whitespace-nowrap';
-      document.getElementById('tabBtnDasha').className = 'pb-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap';
-      document.getElementById('tabBtnRashiphal').className = 'pb-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap';
-    });
-
-    document.getElementById('tabBtnDasha').addEventListener('click', () => {
-      document.getElementById('tabDasha').classList.remove('hidden');
-      document.getElementById('tabPlanets').classList.add('hidden');
-      document.getElementById('tabRashiphal').classList.add('hidden');
-      document.getElementById('tabBtnDasha').className = 'pb-2.5 border-b-2 border-cosmic-gold text-cosmic-gold font-bold whitespace-nowrap';
-      document.getElementById('tabBtnPlanets').className = 'pb-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap';
-      document.getElementById('tabBtnRashiphal').className = 'pb-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap';
-    });
-
-    document.getElementById('tabBtnRashiphal').addEventListener('click', () => {
-      document.getElementById('tabRashiphal').classList.remove('hidden');
-      document.getElementById('tabPlanets').classList.add('hidden');
-      document.getElementById('tabDasha').classList.add('hidden');
-      document.getElementById('tabBtnRashiphal').className = 'pb-2.5 border-b-2 border-cosmic-gold text-cosmic-gold font-bold whitespace-nowrap';
-      document.getElementById('tabBtnPlanets').className = 'pb-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap';
-      document.getElementById('tabBtnDasha').className = 'pb-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap';
-    });
-
-    function calculateChart() {
-      const dob = document.getElementById('dob').value;
-      const tob = document.getElementById('tob').value;
-      const lat = parseFloat(document.getElementById('latitude').value);
-      const lon = parseFloat(document.getElementById('longitude').value);
-      const tz = parseFloat(document.getElementById('tzOffset').value);
-
-      if (!dob || !tob) return;
-
-      const [yr, mo, da] = dob.split('-').map(Number);
-      const [hr, mi] = tob.split(':').map(Number);
-      const localHours = hr + mi / 60.0;
-      const utcHours = localHours - tz;
-
-      const jd = getJulianDay(yr, mo, da, utcHours);
-      const rawPos = computePositions(jd, lat, lon);
-
-      const lagnaSignIndex = Math.floor(rawPos.Lagna / 30);
-      const lagnaSignObj = SIGNS[lagnaSignIndex];
-
-      const planets = Object.keys(rawPos).map(pName => {
-        const long = rawPos[pName];
-        const signIndex = Math.floor(long / 30);
-        const degInSign = long % 30;
-        const deg = Math.floor(degInSign);
-        const mins = Math.floor((degInSign - deg) * 60);
-
-        const nakSpan = 360 / 27;
-        const nakIndex = Math.floor(long / nakSpan);
-        const pada = Math.floor((long % nakSpan) / (nakSpan / 4)) + 1;
-        const houseNum = (signIndex - lagnaSignIndex + 12) % 12 + 1;
-
-        return {
-          name: pName,
-          long,
-          signIndex,
-          signName: SIGNS[signIndex].name,
-          signSanskrit: SIGNS[signIndex].sanskrit,
-          degFormatted: `${deg}° ${mins}'`,
-          nakshatra: NAKSHATRAS[nakIndex].name,
-          nakshatraLord: NAKSHATRAS[nakIndex].lord,
-          pada,
-          house: houseNum
+        const EXALTATION_SIGN = { "Sun": 0, "Moon": 1, "Mars": 9, "Mercury": 5, "Jupiter": 3, "Venus": 11, "Saturn": 6 };
+        const DEBILITATION_SIGN = { "Sun": 6, "Moon": 7, "Mars": 3, "Mercury": 11, "Jupiter": 9, "Venus": 5, "Saturn": 0 };
+        const MOOLATRIKONA_RANGES = {
+            "Sun": [4, 0.0, 20.0], "Moon": [1, 3.0, 30.0], "Mars": [0, 0.0, 12.0],
+            "Mercury": [5, 15.0, 20.0], "Jupiter": [8, 0.0, 10.0], "Venus": [6, 0.0, 15.0], "Saturn": [10, 0.0, 20.0]
         };
-      });
-
-      // Houses Map
-      const housesMap = {};
-      for (let h = 1; h <= 12; h++) {
-        const sIdx = (lagnaSignIndex + (h - 1)) % 12;
-        const occupants = planets.filter(p => p.house === h && p.name !== 'Lagna').map(p => p.name);
-        if (planets.find(p => p.house === h && p.name === 'Lagna')) occupants.unshift('Lagna');
-        housesMap[h] = {
-          houseNum: h,
-          signName: SIGNS[sIdx].name,
-          signSanskrit: SIGNS[sIdx].sanskrit,
-          ruler: SIGNS[sIdx].ruler,
-          occupants
+        const OWN_SIGNS = {
+            "Sun": [4], "Moon": [3], "Mars": [0, 7], "Mercury": [2, 5],
+            "Jupiter": [8, 11], "Venus": [1, 6], "Saturn": [10], "Rahu": [10], "Ketu": [7]
         };
-      }
 
-      // Dasha
-      const moonObj = planets.find(p => p.name === 'Moon');
-      const nakSpan = 360 / 27;
-      const elapsed = moonObj.long % nakSpan;
-      const frac = (nakSpan - elapsed) / nakSpan;
-      const moonNakLord = NAKSHATRAS[Math.floor(moonObj.long / nakSpan)].lord;
-      const remainingFirst = DASHA_YEARS[moonNakLord] * frac;
+        const SIGN_LORDS = ["Mars", "Venus", "Mercury", "Moon", "Sun", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Saturn", "Jupiter"];
+        const RASHI_MULTIPLIERS = [7, 10, 8, 4, 10, 6, 7, 8, 9, 5, 11, 12];
+        const GRAHA_MULTIPLIERS = { "Sun": 5, "Moon": 5, "Mars": 7, "Mercury": 5, "Jupiter": 10, "Venus": 8, "Saturn": 5 };
 
-      const orderStart = DASHA_ORDER.indexOf(moonNakLord);
-      const dashaList = [];
-      let curYr = yr + (mo / 12) + (da / 365);
+        const NAKSHATRAS = [
+            ["Ashwini", "Ketu"], ["Bharani", "Venus"], ["Krittika", "Sun"], ["Rohini", "Moon"],
+            ["Mrigashira", "Mars"], ["Ardra", "Rahu"], ["Punarvasu", "Jupiter"], ["Pushya", "Saturn"],
+            ["Ashlesha", "Mercury"], ["Magha", "Ketu"], ["Purva Phalguni", "Venus"], ["Uttara Phalguni", "Sun"],
+            ["Hasta", "Moon"], ["Chitra", "Mars"], ["Swati", "Rahu"], ["Vishakha", "Jupiter"],
+            ["Anuradha", "Saturn"], ["Jyeshtha", "Mercury"], ["Mula", "Ketu"], ["Purva Ashadha", "Venus"],
+            ["Uttara Ashadha", "Sun"], ["Shravana", "Moon"], ["Dhanishta", "Mars"], ["Shatabhisha", "Rahu"],
+            ["Purva Bhadrapada", "Jupiter"], ["Uttara Bhadrapada", "Saturn"], ["Revati", "Mercury"]
+        ];
 
-      for (let i = 0; i < 9; i++) {
-        const idx = (orderStart + i) % 9;
-        const lord = DASHA_ORDER[idx];
-        const duration = (i === 0) ? remainingFirst : DASHA_YEARS[lord];
-        const sY = Math.floor(curYr);
-        const eY = Math.floor(curYr + duration);
-        dashaList.push({ lord, duration: duration.toFixed(1), startYear: sY, endYear: eY });
-        curYr += duration;
-      }
+        const VIMSHOTTARI_ORDER = [
+            ["Ketu", 7], ["Venus", 20], ["Sun", 6], ["Moon", 10], ["Mars", 7],
+            ["Rahu", 18], ["Jupiter", 16], ["Saturn", 19], ["Mercury", 17]
+        ];
+        const DASHA_YEARS_MAP = Object.fromEntries(VIMSHOTTARI_ORDER);
+        const TOTAL_DASHA_YEARS = 120.0;
+        const DAYS_PER_YEAR = 365.25;
 
-      currentData = {
-        lagnaSign: lagnaSignObj.name,
-        lagnaSanskrit: lagnaSignObj.sanskrit,
-        lagnaRuler: lagnaSignObj.ruler,
-        moonNakshatra: moonObj.nakshatra,
-        moonSign: moonObj.signName,
-        planets,
-        housesMap,
-        dashaList
-      };
+        const BAV_RULES = {
+            "Sun": { "Sun": [1, 2, 4, 7, 8, 9, 10, 11], "Moon": [3, 6, 10, 11], "Mars": [1, 2, 4, 7, 8, 9, 10, 11], "Mercury": [3, 5, 6, 9, 10, 11, 12], "Jupiter": [5, 6, 9, 11], "Venus": [6, 7, 12], "Saturn": [1, 2, 4, 7, 8, 9, 10, 11], "Lagna": [3, 4, 6, 10, 11, 12] },
+            "Moon": { "Sun": [3, 6, 7, 8, 10, 11], "Moon": [1, 3, 6, 7, 10, 11], "Mars": [2, 3, 5, 6, 9, 10, 11], "Mercury": [1, 3, 4, 5, 7, 8, 10, 11], "Jupiter": [1, 4, 7, 8, 10, 11, 12], "Venus": [3, 4, 5, 7, 9, 10, 11], "Saturn": [3, 5, 6, 11], "Lagna": [3, 6, 10, 11] },
+            "Mars": { "Sun": [3, 5, 6, 10, 11], "Moon": [3, 6, 11], "Mars": [1, 2, 4, 7, 8, 10, 11], "Mercury": [3, 5, 6, 11], "Jupiter": [6, 10, 11, 12], "Venus": [6, 8, 11, 12], "Saturn": [1, 4, 7, 8, 9, 10, 11], "Lagna": [1, 3, 6, 10, 11] },
+            "Mercury": { "Sun": [5, 6, 9, 11, 12], "Moon": [2, 4, 6, 8, 10, 11], "Mars": [1, 2, 4, 7, 8, 9, 10, 11], "Mercury": [1, 3, 5, 6, 9, 10, 11, 12], "Jupiter": [6, 8, 11, 12], "Venus": [1, 2, 3, 4, 5, 8, 9, 11], "Saturn": [1, 2, 4, 7, 8, 9, 10, 11], "Lagna": [1, 2, 4, 6, 8, 10, 11] },
+            "Jupiter": { "Sun": [1, 2, 3, 4, 7, 8, 9, 10, 11], "Moon": [2, 5, 7, 9, 11], "Mars": [1, 2, 4, 7, 8, 10, 11], "Mercury": [1, 2, 4, 5, 6, 9, 10, 11], "Jupiter": [1, 2, 3, 4, 7, 8, 10, 11], "Venus": [2, 5, 6, 9, 10, 11], "Saturn": [3, 5, 6, 12], "Lagna": [1, 2, 3, 4, 5, 6, 7, 9, 10, 11] },
+            "Venus": { "Sun": [8, 11, 12], "Moon": [1, 2, 3, 4, 5, 8, 9, 11, 12], "Mars": [3, 5, 6, 9, 11, 12], "Mercury": [3, 5, 6, 9, 11], "Jupiter": [5, 8, 9, 10, 11], "Venus": [1, 2, 3, 4, 5, 8, 9, 10, 11], "Saturn": [3, 4, 5, 8, 9, 10, 11], "Lagna": [1, 2, 3, 4, 5, 8, 9, 11] },
+            "Saturn": { "Sun": [1, 2, 4, 7, 8, 10, 11], "Moon": [3, 6, 11], "Mars": [3, 5, 6, 10, 11, 12], "Mercury": [6, 8, 9, 10, 11, 12], "Jupiter": [5, 6, 11, 12], "Venus": [6, 11, 12], "Saturn": [3, 5, 6, 11], "Lagna": [1, 3, 4, 6, 10, 11] }
+        };
 
-      // Update Summary
-      document.getElementById('hlLagna').innerText = `${currentData.lagnaSign} (${currentData.lagnaSanskrit})`;
-      document.getElementById('hlNakshatra').innerText = `${currentData.moonNakshatra}`;
+        const DUAL_LORD_PAIRS = {
+            "Mars": [0, 7], "Mercury": [2, 5], "Jupiter": [8, 11], "Venus": [1, 6], "Saturn": [9, 10]
+        };
 
-      renderChartSVG();
-      renderPlanetaryTable();
-      renderDashaTable();
-      renderRashiphal();
-    }
+        const TRANSIT_SNAPSHOTS = [
+            {
+                planet: "Saturn (शनि)", sign: "Pisces (मीन)", house: "2nd House / द्वितीय भाव",
+                status: "Retrograde / वक्री (Sade Sati Phase 3)",
+                desc_en: "Final phase of Sade Sati. Tests financial foundations and demands structural discipline.",
+                desc_hi: "साढ़े साती का अंतिम चरण। वित्तीय नींव की परीक्षा और संरचनात्मक अनुशासन की मांग।"
+            },
+            {
+                planet: "Jupiter (गुरु)", sign: "Cancer (कर्क)", house: "6th House / षष्ठ भाव",
+                status: "Exalted / उच्च (Maximum Protection)",
+                desc_en: "Classical protection against legal friction and opponents; clears obstacles.",
+                desc_hi: "कानूनी विवादों और विरोधियों से मजबूत सुरक्षा; बाधाओं का निवारण।"
+            },
+            {
+                planet: "Rahu (राहु)", sign: "Aquarius (कुंभ)", house: "1st House / प्रथम भाव",
+                status: "Identity Reconstruction / व्यक्तित्व पुनर्गठन",
+                desc_en: "Shifts core identity and opens foreign pathways; breaks old patterns.",
+                desc_hi: "मूल पहचान में बदलाव और विदेशी अवसरों का मार्ग; पुराने ढर्रे को तोड़ता है।"
+            },
+            {
+                planet: "Ketu (केतु)", sign: "Leo (सिंह)", house: "7th House / सप्तम भाव",
+                status: "Dissolution & Refinement / विसर्जन और परिष्कार",
+                desc_en: "Filters partnerships and refines public relations; dissolves opposition.",
+                desc_hi: "साझेदारी का फ़िल्टर और सार्वजनिक संबंधों का शोधन; विरोध का शमन।"
+            }
+        ];
 
-    const svgDiamondPaths = [
-      { id: 1, path: "M 150,20 L 280,150 L 150,280 L 20,150 Z", textX: 150, textY: 100, labelX: 150, labelY: 130 },
-      { id: 2, path: "M 20,20 L 150,20 L 20,150 Z", textX: 60, textY: 55, labelX: 75, labelY: 85 },
-      { id: 3, path: "M 20,20 L 20,150 L 150,20 Z", textX: 45, textY: 110, labelX: 60, labelY: 135 },
-      { id: 4, path: "M 20,150 L 150,280 L 20,280 Z", textX: 60, textY: 220, labelX: 75, labelY: 245 },
-      { id: 5, path: "M 20,280 L 150,280 L 20,380 Z", textX: 60, textY: 330, labelX: 75, labelY: 355 },
-      { id: 6, path: "M 150,280 L 20,380 L 150,380 Z", textX: 100, textY: 360, labelX: 115, labelY: 375 },
-      { id: 7, path: "M 150,150 L 280,280 L 150,380 L 20,280 Z", textX: 150, textY: 240, labelX: 150, labelY: 270 },
-      { id: 8, path: "M 150,280 L 280,380 L 150,380 Z", textX: 200, textY: 360, labelX: 185, labelY: 375 },
-      { id: 9, path: "M 280,280 L 280,380 L 150,380 Z", textX: 240, textY: 330, labelX: 225, labelY: 355 },
-      { id: 10, path: "M 150,150 L 280,20 L 280,280 Z", textX: 240, textY: 150, labelX: 225, labelY: 180 },
-      { id: 11, path: "M 150,20 L 280,20 L 280,150 Z", textX: 240, textY: 60, labelX: 225, labelY: 85 },
-      { id: 12, path: "M 150,20 L 280,20 L 150,150 Z", textX: 200, textY: 45, labelX: 185, labelY: 70 }
-    ];
+        let currentCalculatedData = null;
 
-    function renderChartSVG() {
-      if (!currentData) return;
-      let html = '';
+        // UI Tab and Horizon Switcher Handlers
+        window.switchHorizon = function(horizonKey) {
+            const btn1 = document.getElementById('btn-horizon-1Y');
+            const btn5 = document.getElementById('btn-horizon-5Y');
+            const btn10 = document.getElementById('btn-horizon-10Y');
+            
+            if (btn1) btn1.className = (horizonKey === '1Y') ? "px-3 py-1.5 text-xs font-bold rounded-xl bg-celestial-700 text-celestial-accent border border-celestial-600" : "px-3 py-1.5 text-xs font-medium rounded-xl text-slate-400 hover:text-slate-200";
+            if (btn5) btn5.className = (horizonKey === '5Y') ? "px-3 py-1.5 text-xs font-bold rounded-xl bg-celestial-700 text-celestial-accent border border-celestial-600" : "px-3 py-1.5 text-xs font-medium rounded-xl text-slate-400 hover:text-slate-200";
+            if (btn10) btn10.className = (horizonKey === '10Y') ? "px-3 py-1.5 text-xs font-bold rounded-xl bg-celestial-700 text-celestial-accent border border-celestial-600" : "px-3 py-1.5 text-xs font-medium rounded-xl text-slate-400 hover:text-slate-200";
 
-      if (chartStyle === 'north') {
-        html = `
-          <svg viewBox="0 0 300 300" class="w-full h-full text-slate-100 font-sans select-none drop-shadow-xl">
-            <rect x="5" y="5" width="290" height="290" fill="#0B0D1B" stroke="#334155" stroke-width="2" rx="12" />
-            ${svgDiamondPaths.map(h => {
-              const hInfo = currentData.housesMap[h.id];
-              return `
-                <g class="cursor-pointer group" onclick="inspectHouse(${h.id})">
-                  <path d="${h.path}" class="fill-slate-900/60 stroke-slate-700/80 hover:fill-purple-900/40 hover:stroke-amber-400 transition" />
-                  <text x="${h.textX}" y="${h.textY}" fill="#94A3B8" font-size="10" font-weight="bold" text-anchor="middle">${h.id}</text>
-                  <text x="${h.labelX}" y="${h.labelY}" fill="#E2B049" font-size="9" font-weight="bold" text-anchor="middle">${hInfo.occupants.join(', ')}</text>
-                </g>
-              `;
-            }).join('')}
-          </svg>
-        `;
-      } else {
-        html = `<div class="w-full h-full grid grid-cols-4 grid-rows-4 border border-amber-500/40 rounded-xl overflow-hidden bg-slate-950">`;
-        [12, 1, 2, 3, 11, 0, 0, 4, 10, 0, 0, 5, 9, 8, 7, 6].forEach((sNum, idx) => {
-          if (sNum === 0) {
-            if (idx === 5) html += `<div class="col-span-2 row-span-2 border border-slate-800 bg-[#070913] flex items-center justify-center text-center p-2 text-xs font-serif-title text-cosmic-gold">South Indian Kundali</div>`;
-            return;
-          }
-          const hObj = Object.values(currentData.housesMap).find(h => SIGNS.findIndex(s => s.name === h.signName) + 1 === sNum);
-          html += `
-            <div class="border border-slate-800 p-1 flex flex-col justify-between text-[10px]" onclick="inspectHouse(${hObj?.houseNum || 1})">
-              <span class="text-slate-500 font-bold">${SIGNS[sNum - 1].sanskrit}</span>
-              <span class="text-amber-300 font-bold text-center">${hObj ? hObj.occupants.join(', ') : ''}</span>
-              <span class="text-slate-600 text-[9px]">H${hObj?.houseNum}</span>
-            </div>
-          `;
+            ['card-horizon-1Y', 'card-horizon-5Y', 'card-horizon-10Y'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+            const activeCard = document.getElementById(`card-horizon-${horizonKey}`);
+            if (activeCard) activeCard.classList.remove('hidden');
+        };
+
+        window.switchMainTab = function(tabId) {
+            const tabs = document.querySelectorAll("#mainTabContainer .tab-btn");
+            tabs.forEach(t => {
+                t.className = "tab-btn px-4 py-2 text-sm font-medium rounded-t-xl transition whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-celestial-800/60";
+            });
+
+            const activeBtn = document.getElementById("tab-" + tabId);
+            if (activeBtn) {
+                activeBtn.className = "tab-btn px-4 py-2 text-sm font-medium rounded-t-xl transition whitespace-nowrap bg-celestial-700 text-celestial-accent border-t border-x border-celestial-600";
+            }
+
+            const contents = document.querySelectorAll("#mainViewsContainer .tab-content");
+            contents.forEach(c => c.classList.add("hidden"));
+
+            const activeContent = document.getElementById(tabId);
+            if (activeContent) activeContent.classList.remove("hidden");
+        };
+
+        function renderTransitCards() {
+            const grid = document.getElementById("transitSnapshotGrid");
+            if (!grid) return;
+            grid.innerHTML = "";
+            TRANSIT_SNAPSHOTS.forEach(t => {
+                grid.innerHTML += `
+                    <div class="bg-celestial-800/80 border border-celestial-700 rounded-xl p-3.5 space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-xs text-celestial-accent font-cinzel">${t.planet}</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded bg-celestial-700 text-celestial-accentLight font-semibold">${t.house}</span>
+                        </div>
+                        <div class="text-[11px] font-semibold text-slate-200">${t.sign} • <span class="text-amber-400">${t.status}</span></div>
+                        <p class="text-[11px] text-slate-300 leading-snug">${t.desc_en}</p>
+                        <p class="text-[10px] text-amber-200/70 pt-1 border-t border-celestial-700/50">${t.desc_hi}</p>
+                    </div>
+                `;
+            });
+        }
+
+        // Math & Astronomical Utilities
+        function toRad(deg) { return deg * Math.PI / 180.0; }
+        function toDeg(rad) { return rad * 180.0 / Math.PI; }
+        function norm360(deg) { let d = deg % 360.0; return d < 0 ? d + 360.0 : d; }
+
+        function getJulianDayUT(year, month, day, hourDecimal) {
+            if (month <= 2) { year -= 1; month += 12; }
+            let A = Math.floor(year / 100);
+            let B = 2 - A + Math.floor(A / 4);
+            return Math.floor(365.25 * (year + 4716)) + Math.floor(30.6001 * (month + 1)) + day + B - 1524.5 + (hourDecimal / 24.0);
+        }
+
+        function getLahiriAyanamsa(jdUT) {
+            let T = (jdUT - 2451545.0) / 36525.0;
+            return 23.85 + (T * 1.396) + (T * T * 0.0003);
+        }
+
+        function calculateSiderealLongitudes(jdUT, lat, lon) {
+            let d = jdUT - 2451545.0;
+            let T = d / 36525.0;
+
+            let L0 = norm360(280.46646 + 36000.76983 * T);
+            let M_sun = norm360(357.52911 + 35999.05029 * T);
+            let C_sun = (1.914602 - 0.004817 * T) * Math.sin(toRad(M_sun)) + (0.019993 - 0.000101 * T) * Math.sin(toRad(2 * M_sun));
+            let sun_trop = norm360(L0 + C_sun);
+
+            let L_moon = norm360(218.3165 + 481267.8813 * T);
+            let M_moon = norm360(134.9634 + 477198.8675 * T);
+            let C_moon = 6.2886 * Math.sin(toRad(M_moon)) + 1.2740 * Math.sin(toRad(2 * (L_moon - sun_trop) - M_moon));
+            let moon_trop = norm360(L_moon + C_moon);
+
+            let rahu_trop = norm360(125.04452 - 1934.136261 * T);
+            let ketu_trop = norm360(rahu_trop + 180.0);
+
+            let mars_trop = norm360(355.453 + 19140.299 * T + 0.6 * Math.sin(toRad(355.453 + 19140.299 * T)));
+            let mercury_trop = norm360(sun_trop + 15.0 * Math.sin(toRad(M_sun * 3.0)));
+            let jupiter_trop = norm360(34.404 + 3034.906 * T + 2.0 * Math.sin(toRad(34.404 + 3034.906 * T)));
+            let venus_trop = norm360(sun_trop + 22.0 * Math.sin(toRad(M_sun * 1.5)));
+            let saturn_trop = norm360(50.077 + 1222.114 * T + 1.5 * Math.sin(toRad(50.077 + 1222.114 * T)));
+
+            let ayanamsa = getLahiriAyanamsa(jdUT);
+
+            let planets = {
+                "Sun": norm360(sun_trop - ayanamsa),
+                "Moon": norm360(moon_trop - ayanamsa),
+                "Mars": norm360(mars_trop - ayanamsa),
+                "Mercury": norm360(mercury_trop - ayanamsa),
+                "Jupiter": norm360(jupiter_trop - ayanamsa),
+                "Venus": norm360(venus_trop - ayanamsa),
+                "Saturn": norm360(saturn_trop - ayanamsa),
+                "Rahu": norm360(rahu_trop - ayanamsa),
+                "Ketu": norm360(ketu_trop - ayanamsa)
+            };
+
+            let GMST0 = norm360(280.46061837 + 360.98564736629 * d);
+            let LST = norm360(GMST0 + lon);
+            let eps = 23.439291 - 0.0130042 * T;
+            let asc_rad = Math.atan2(Math.cos(toRad(LST)), -Math.sin(toRad(LST)) * Math.cos(toRad(eps)) - Math.tan(toRad(lat)) * Math.sin(toRad(eps)));
+            let asc_sidereal = norm360(toDeg(asc_rad) - ayanamsa);
+
+            return { ayanamsa, ascendant: asc_sidereal, planets };
+        }
+
+        function getRashiIndex(lon) { return Math.floor(norm360(lon) / 30.0); }
+        function getWholeSignHouse(planetRashi, lagnaRashi) { return ((planetRashi - lagnaRashi + 12) % 12) + 1; }
+
+        function formatDMS(deg) {
+            let norm = norm360(deg);
+            let d = Math.floor(norm);
+            let remM = (norm - d) * 60.0;
+            let m = Math.floor(remM);
+            let s = (remM - m) * 60.0;
+            return `${String(d).padStart(2,'0')}°${String(m).padStart(2,'0')}'${s.toFixed(1).padStart(4,'0')}"`;
+        }
+
+        function getNakshatraInfo(lon) {
+            let norm = norm360(lon);
+            let nakSpan = 360.0 / 27.0;
+            let nakIdx = Math.min(Math.floor(norm / nakSpan), 26);
+            let degInNak = norm % nakSpan;
+            let pada = Math.min(Math.floor(degInNak / (nakSpan / 4.0)) + 1, 4);
+            let [name, lord] = NAKSHATRAS[nakIdx];
+            return { index: nakIdx + 1, name, lord, pada, fractionRemaining: 1.0 - (degInNak / nakSpan) };
+        }
+
+        function getNavamshaInfo(sidLon) {
+            let norm = norm360(sidLon);
+            let d1RashiIdx = Math.floor(norm / 30.0);
+            let degInSign = norm % 30.0;
+            let navPart = Math.min(Math.floor(degInSign / (30.0 / 9.0)), 8);
+            let startOffset = [0, 8, 4][d1RashiIdx % 3];
+            let d9RashiIdx = (d1RashiIdx + startOffset + navPart) % 12;
+            return { pada: navPart + 1, d9RashiIdx, d9Rashi: RASHIS[d9RashiIdx], vargottama: d1RashiIdx === d9RashiIdx };
+        }
+
+        function isMoolatrikona(planetName, rashiIdx, degInSign) {
+            let mt = MOOLATRIKONA_RANGES[planetName];
+            if (!mt) return false;
+            return rashiIdx === mt[0] && (degInSign >= mt[1] && degInSign < mt[2]);
+        }
+
+        function getDignity(planetName, rashiIdx, degInSign = null) {
+            if (EXALTATION_SIGN[planetName] === rashiIdx) return "Exalted";
+            if (DEBILITATION_SIGN[planetName] === rashiIdx) return "Debilitated";
+            if (degInSign !== null && isMoolatrikona(planetName, rashiIdx, degInSign)) return "Moolatrikona";
+            if (OWN_SIGNS[planetName] && OWN_SIGNS[planetName].includes(rashiIdx)) return "Swakshetra";
+            return "Neutral";
+        }
+
+        function getDignityBadgeClass(dignity) {
+            switch(dignity) {
+                case "Exalted": return "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
+                case "Debilitated": return "bg-rose-500/20 text-rose-300 border border-rose-500/40";
+                case "Moolatrikona": return "bg-amber-500/20 text-amber-300 border border-amber-500/40";
+                case "Swakshetra": return "bg-blue-500/20 text-blue-300 border border-blue-500/40";
+                default: return "bg-slate-700/50 text-slate-400";
+            }
+        }
+
+        function computeVimshottariDashas(moonSidLon, birthDt) {
+            let moonNak = getNakshatraInfo(moonSidLon);
+            let startLord = moonNak.lord;
+            let startIdx = VIMSHOTTARI_ORDER.findIndex(([lord]) => lord === startLord);
+
+            let balanceYears = moonNak.fractionRemaining * DASHA_YEARS_MAP[startLord];
+            let mahadashas = [];
+            let currentStart = new Date(birthDt.getTime());
+
+            for (let step = 0; step < VIMSHOTTARI_ORDER.length; step++) {
+                let [lord, fullYears] = VIMSHOTTARI_ORDER[(startIdx + step) % VIMSHOTTARI_ORDER.length];
+                let durationYears = (step === 0) ? balanceYears : fullYears;
+                let durationDays = durationYears * DAYS_PER_YEAR;
+                let currentEnd = new Date(currentStart.getTime() + durationDays * 86400000);
+
+                let mdStartAdIdx = VIMSHOTTARI_ORDER.findIndex(([l]) => l === lord);
+                let fullMdStart = (step === 0)
+                    ? new Date(birthDt.getTime() - (fullYears - balanceYears) * DAYS_PER_YEAR * 86400000)
+                    : new Date(currentStart.getTime());
+
+                let antardashas = [];
+                let adCursor = new Date(fullMdStart.getTime());
+
+                for (let adStep = 0; adStep < VIMSHOTTARI_ORDER.length; adStep++) {
+                    let [adLord, adYears] = VIMSHOTTARI_ORDER[(mdStartAdIdx + adStep) % VIMSHOTTARI_ORDER.length];
+                    let adDurationDays = (fullYears * adYears / TOTAL_DASHA_YEARS) * DAYS_PER_YEAR;
+                    let adEnd = new Date(adCursor.getTime() + adDurationDays * 86400000);
+
+                    if (adEnd > birthDt) {
+                        let effectiveAdStart = new Date(Math.max(adCursor.getTime(), birthDt.getTime()));
+                        antardashas.push({ lord: adLord, start: effectiveAdStart, end: adEnd });
+                    }
+                    adCursor = adEnd;
+                }
+
+                mahadashas.push({ lord, durationYears, start: currentStart, end: currentEnd, isBirthBalance: step === 0, antardashas });
+                currentStart = currentEnd;
+            }
+
+            return { moonNakshatra: moonNak, birthBalanceYears: balanceYears, mahadashas };
+        }
+
+        function resolveActiveDasha(dashaData, targetDt) {
+            let targetTime = targetDt.getTime();
+            let mahadashas = dashaData.mahadashas;
+            if (!mahadashas || targetTime < mahadashas[0].start.getTime() || targetTime >= mahadashas[mahadashas.length - 1].end.getTime()) return null;
+            let activeMd = mahadashas.find(md => targetTime >= md.start.getTime() && targetTime < md.end.getTime());
+            if (!activeMd) return null;
+            let activeAd = activeMd.antardashas.find(ad => targetTime >= ad.start.getTime() && targetTime < ad.end.getTime()) || activeMd.antardashas[activeMd.antardashas.length - 1];
+            return { queryDate: targetDt, md: activeMd, ad: activeAd };
+        }
+
+        function computeAshtakavargaEngine(contributorSigns, d1LagnaIdx, occupiedSigns) {
+            let rawBavSign = {}, trikonaBavSign = {}, finalBavSign = {};
+            let rawBavHouse = {}, trikonaBavHouse = {}, finalBavHouse = {};
+            let rawTotals = {}, trikonaTotals = {}, finalTotals = {};
+            let shodhyaPindas = {};
+
+            function applyTrikona(signBindus) {
+                let res = [...signBindus];
+                [[0,4,8], [1,5,9], [2,6,10], [3,7,11]].forEach(([s1,s2,s3]) => {
+                    let vals = [res[s1], res[s2], res[s3]];
+                    if (vals.every(v => v > 0)) {
+                        let minV = Math.min(...vals);
+                        res[s1] -= minV; res[s2] -= minV; res[s3] -= minV;
+                    }
+                });
+                return res;
+            }
+
+            function applyEkadhipatya(planet, trikonaBindus) {
+                let res = [...trikonaBindus];
+                let pair = DUAL_LORD_PAIRS[planet];
+                if (!pair) return res;
+                let [sa, sb] = pair;
+                let occA = occupiedSigns.has(sa);
+                let occB = occupiedSigns.has(sb);
+
+                if (!occA && !occB) {
+                    let minV = Math.min(res[sa], res[sb]);
+                    res[sa] = minV; res[sb] = minV;
+                } else if (occA && !occB) {
+                    if (res[sb] > res[sa]) res[sb] = res[sa];
+                } else if (occB && !occA) {
+                    if (res[sa] > res[sb]) res[sa] = res[sb];
+                }
+                return res;
+            }
+
+            function signsToHouses(signArr) {
+                let houseArr = new Array(12);
+                for (let h = 0; h < 12; h++) {
+                    houseArr[h] = signArr[(d1LagnaIdx + h) % 12];
+                }
+                return houseArr;
+            }
+
+            ASHTAKAVARGA_PLANETS.forEach(planet => {
+                let bindus = new Array(12).fill(0);
+                ASHTAKAVARGA_CONTRIBUTORS.forEach(contrib => {
+                    let cSign = contributorSigns[contrib];
+                    let offsets = BAV_RULES[planet][contrib];
+                    for (let targetSign = 0; targetSign < 12; targetSign++) {
+                        let houseOffset = ((targetSign - cSign + 12) % 12) + 1;
+                        if (offsets.includes(houseOffset)) {
+                            bindus[targetSign]++;
+                        }
+                    }
+                });
+
+                let afterTrikona = applyTrikona(bindus);
+                let afterEkadhipatya = applyEkadhipatya(planet, afterTrikona);
+
+                rawBavSign[planet] = bindus;
+                trikonaBavSign[planet] = afterTrikona;
+                finalBavSign[planet] = afterEkadhipatya;
+
+                rawBavHouse[planet] = signsToHouses(bindus);
+                trikonaBavHouse[planet] = signsToHouses(afterTrikona);
+                finalBavHouse[planet] = signsToHouses(afterEkadhipatya);
+
+                rawTotals[planet] = bindus.reduce((a,b) => a+b, 0);
+                trikonaTotals[planet] = afterTrikona.reduce((a,b) => a+b, 0);
+                finalTotals[planet] = afterEkadhipatya.reduce((a,b) => a+b, 0);
+
+                let rashiPinda = 0, grahaPinda = 0;
+                for (let s = 0; s < 12; s++) {
+                    let b = afterEkadhipatya[s];
+                    rashiPinda += b * RASHI_MULTIPLIERS[s];
+                    grahaPinda += b * GRAHA_MULTIPLIERS[SIGN_LORDS[s]];
+                }
+                shodhyaPindas[planet] = {
+                    rashiPinda, grahaPinda, shodhyaPinda: rashiPinda + grahaPinda
+                };
+            });
+
+            let savRawSign = new Array(12).fill(0);
+            let savTrikonaSign = new Array(12).fill(0);
+            let savFinalSign = new Array(12).fill(0);
+
+            for (let s = 0; s < 12; s++) {
+                ASHTAKAVARGA_PLANETS.forEach(p => {
+                    savRawSign[s] += rawBavSign[p][s];
+                    savTrikonaSign[s] += trikonaBavSign[p][s];
+                    savFinalSign[s] += finalBavSign[p][s];
+                });
+            }
+
+            return {
+                rawBavSign, trikonaBavSign, finalBavSign,
+                rawBavHouse, trikonaBavHouse, finalBavHouse,
+                rawTotals, trikonaTotals, finalTotals, shodhyaPindas,
+                savRawSign, savTrikonaSign, savFinalSign,
+                savRawHouse: signsToHouses(savRawSign),
+                savFinalHouse: signsToHouses(savFinalSign),
+                savRawTotal: savRawSign.reduce((a,b)=>a+b,0),
+                savFinalTotal: savFinalSign.reduce((a,b)=>a+b,0)
+            };
+        }
+
+        function getD10RashiIndex(d1RashiIdx, degInSign) {
+            let part = Math.min(Math.floor(degInSign / 3.0), 9);
+            let isOdd = (d1RashiIdx % 2 === 0); 
+            let startSign = isOdd ? d1RashiIdx : (d1RashiIdx + 8) % 12;
+            return (startSign + part) % 12;
+        }
+
+        function computeDoshasAndYogas(data) {
+            let doshas = [];
+            let yogas = [];
+
+            // 1. Manglik Dosha Evaluation
+            let marsHouse = data.grahas.find(g => g.name === "Mars").d1House;
+            let manglikHouses = [1, 4, 7, 8, 12];
+            let isManglik = manglikHouses.includes(marsHouse);
+            doshas.push({
+                name: "Manglik Dosha (मांगलिक दोष)",
+                status: isManglik ? "Active / उपस्थित" : "Absent / अनुपस्थित",
+                severity: isManglik ? "Moderate" : "None",
+                desc_en: isManglik ? `Mars occupies House ${marsHouse}. Requires balanced matching and Hanuman Chalisa remedies.` : "Mars does not occupy 1st, 4th, 7th, 8th, or 12th houses.",
+                desc_hi: isManglik ? `मंगल ${marsHouse}वें भाव में स्थित है। नियमित हनुमान चालीसा पाठ व संतुलन आवश्यक।` : "मंगल 1, 4, 7, 8 या 12वें भाव में नहीं है।"
+            });
+
+            // 2. Kalsarpa Dosha Check
+            let rahuLon = data.grahas.find(g => g.name === "Rahu").sidLon;
+            let ketuLon = data.grahas.find(g => g.name === "Ketu").sidLon;
+            let otherLons = data.grahas.filter(g => g.name !== "Rahu" && g.name !== "Ketu").map(g => g.sidLon);
+            let allOneSide = otherLons.every(l => ((l - rahuLon + 360) % 360) < 180);
+            doshas.push({
+                name: "Kalsarpa Dosha (कालसर्प दोष)",
+                status: allOneSide ? "Partial / आंशिक" : "Nullified / निरस्त",
+                severity: allOneSide ? "Mild-Moderate" : "None",
+                desc_en: allOneSide ? "Planets hemmed along nodal axis. Periodic Shiva Abhishek is recommended." : "Planets distributed across both sides of Rahu-Ketu axis.",
+                desc_hi: allOneSide ? "ग्रह राहु-केतु अक्ष के भीतर स्थित हैं। सोमवारी शिव अभिषेक लाभकारी है।" : "सभी ग्रह राहु-केतु अक्ष के दोनों ओर प्रसारित हैं।"
+            });
+
+            // 3. Shasha Mahapurusha Yoga
+            let saturn = data.grahas.find(g => g.name === "Saturn");
+            let isShasha = [1, 4, 7, 10].includes(saturn.d1House) && (saturn.d1Dignity === "Swakshetra" || saturn.d1Dignity === "Exalted");
+            if (isShasha) {
+                yogas.push({
+                    name: "Shasha Mahapurusha Yoga (शश महापुरुष योग)",
+                    type: "Panch Mahapurusha",
+                    desc_en: "Saturn in own/exaltation sign in a Kendra house. Grants structural leadership, operational authority, and long-term stamina.",
+                    desc_hi: "केन्द्र भाव में शनि स्वराशि/उच्च स्थित। दीर्घकालिक नेतृत्व, प्रशासनिक क्षमता व सहनशक्ति का प्रतीक।"
+                });
+            }
+
+            // 4. Guru-Mangala Yoga
+            let jupiter = data.grahas.find(g => g.name === "Jupiter");
+            let mars = data.grahas.find(g => g.name === "Mars");
+            if (jupiter.d1House === mars.d1House) {
+                yogas.push({
+                    name: "Guru-Mangala Yoga (गुरु-मंगल योग)",
+                    type: "Wealth & Enterprise",
+                    desc_en: `Jupiter and Mars conjoint in House ${jupiter.d1House}. Combines vision with decisive execution for enterprise wealth.`,
+                    desc_hi: `गुरु व मंगल ${jupiter.d1House}वें भाव में एक साथ स्थित। दूरदर्शिता एवं साहसिक कार्यक्षमता का अद्भुत संयोग।`
+                });
+            }
+
+            return { doshas, yogas };
+        }
+
+        function renderDoshaCards(data) {
+            let res = computeDoshasAndYogas(data);
+            let container = document.getElementById("doshaCardsGrid");
+            if (!container) return;
+            container.innerHTML = "";
+
+            res.doshas.forEach(d => {
+                let badgeClass = d.severity === "None" ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40" : "bg-amber-500/20 text-amber-300 border border-amber-500/40";
+                container.innerHTML += `
+                    <div class="bg-celestial-900/80 border border-celestial-700 rounded-xl p-4 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-cinzel font-bold text-celestial-accent text-xs">${d.name}</h4>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeClass}">${d.status}</span>
+                        </div>
+                        <p class="text-xs text-slate-300">${d.desc_en}</p>
+                        <p class="text-[11px] text-amber-200/70 border-t border-celestial-700/50 pt-1.5">${d.desc_hi}</p>
+                    </div>
+                `;
+            });
+        }
+
+        function renderYogaCards(data) {
+            let res = computeDoshasAndYogas(data);
+            let container = document.getElementById("yogaCardsGrid");
+            if (!container) return;
+            container.innerHTML = "";
+
+            if (res.yogas.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400">Standard planetary combinations active.</p>`;
+                return;
+            }
+
+            res.yogas.forEach(y => {
+                container.innerHTML += `
+                    <div class="bg-celestial-900/80 border border-celestial-accent/30 rounded-xl p-4 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-cinzel font-bold text-celestial-accentLight text-sm"><i class="fa-solid fa-crown text-amber-400 mr-1.5"></i> ${y.name}</h4>
+                            <span class="px-2 py-0.5 rounded bg-celestial-700 text-celestial-accent font-bold text-[10px]">${y.type}</span>
+                        </div>
+                        <p class="text-xs text-slate-200">${y.desc_en}</p>
+                        <p class="text-[11px] text-amber-200/70 border-t border-celestial-700/50 pt-1.5">${y.desc_hi}</p>
+                    </div>
+                `;
+            });
+        }
+
+        function renderGemstoneCards(data) {
+            let container = document.getElementById("gemstoneCardsGrid");
+            if (!container) return;
+            container.innerHTML = "";
+
+            let items = [
+                {
+                    name: "Pearl (मोती / Moti)",
+                    purpose: "Moon / Rahu Balance",
+                    wearing: "Right Little Finger (Silver)",
+                    desc_en: "Strengthens emotional resilience and calms restless thoughts.",
+                    desc_hi: "मानसिक शांति व चंद्रमा के संतुलन हेतु उपयुक्त।"
+                },
+                {
+                    name: "Opal / Diamond (ओपल / हीरा)",
+                    purpose: "Venus Fortune Activation",
+                    wearing: "Right Ring Finger (Silver/Platinum)",
+                    desc_en: "Activates 9th house lord for wealth, luxury, and smooth luck flow.",
+                    desc_hi: "भाग्येश शुक्र की ऊर्जा बढ़ाकर सुख-समृद्धि में वृद्धि।"
+                },
+                {
+                    name: "2 Mukhi Rudraksha (द्विमुखी रुद्राक्ष)",
+                    purpose: "Emotional Stability",
+                    wearing: "Worn around Neck in Silver Cap",
+                    desc_en: "Harmonizes Moon-Rahu energy and balances interpersonal relationships.",
+                    desc_hi: "चंद्र-राहु दोष निवारण व मानसिक स्थिरता हेतु अमोघ उपाय।"
+                }
+            ];
+
+            items.forEach(g => {
+                container.innerHTML += `
+                    <div class="bg-celestial-900/80 border border-celestial-700 rounded-xl p-4 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-cinzel font-bold text-amber-300 text-xs">${g.name}</h4>
+                            <span class="px-2 py-0.5 rounded bg-celestial-700 text-slate-200 font-bold text-[10px]">${g.purpose}</span>
+                        </div>
+                        <p class="text-[11px] font-semibold text-celestial-accentLight">${g.wearing}</p>
+                        <p class="text-xs text-slate-300">${g.desc_en}</p>
+                        <p class="text-[11px] text-amber-200/70 border-t border-celestial-700/50 pt-1.5">${g.desc_hi}</p>
+                    </div>
+                `;
+            });
+        }
+
+        function renderCalculatedData(data) {
+            currentCalculatedData = data;
+
+            let nameVal = document.getElementById("inputName") ? document.getElementById("inputName").value : "Native";
+            let headerBadge = document.getElementById("headerProfileName");
+            if (headerBadge) headerBadge.innerText = nameVal;
+
+            // 1. D-1 Chart rendering
+            let d1HouseMap = {};
+            for (let h = 1; h <= 12; h++) d1HouseMap[h] = [];
+            let d1Tbody = document.getElementById("d1GrahaTableBody");
+            if (d1Tbody) d1Tbody.innerHTML = "";
+
+            data.grahas.forEach(g => {
+                d1HouseMap[g.d1House].push(g.name.substring(0,2));
+
+                if (d1Tbody) {
+                    let dignityBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold ${getDignityBadgeClass(g.d1Dignity)}">${g.d1Dignity}</span>`;
+                    d1Tbody.innerHTML += `
+                        <tr class="hover:bg-celestial-700/30">
+                            <td class="p-2.5 font-bold text-slate-100">${g.name}</td>
+                            <td class="p-2.5">${g.d1Rashi}</td>
+                            <td class="p-2.5 font-mono text-celestial-accentLight">${formatDMS(g.degInSign)}</td>
+                            <td class="p-2.5 font-bold text-slate-200">H${g.d1House}</td>
+                            <td class="p-2.5">${g.nakshatra.name} <span class="text-slate-400">(P${g.nakshatra.pada})</span></td>
+                            <td class="p-2.5">${dignityBadge}</td>
+                        </tr>
+                    `;
+                }
+            });
+            let svgD1 = document.getElementById("svgD1ChartContainer");
+            if (svgD1) svgD1.innerHTML = renderNorthIndianChartSVG(d1HouseMap, data.d1LagnaIdx);
+
+            // 2. D-9 Navamsha Chart rendering
+            let d9HouseMap = {};
+            for (let h = 1; h <= 12; h++) d9HouseMap[h] = [];
+            let d9Tbody = document.getElementById("d9GrahaTableBody");
+            if (d9Tbody) d9Tbody.innerHTML = "";
+
+            data.grahas.forEach(g => {
+                d9HouseMap[g.d9House].push(g.name.substring(0,2));
+                if (d9Tbody) {
+                    let vgBadge = g.vargottama ? `<span class="px-2 py-0.5 rounded bg-celestial-accent text-celestial-900 font-bold text-[10px]"><i class="fa-solid fa-gem mr-1"></i> Vargottama</span>` : `<span class="text-slate-500">-</span>`;
+                    let d9DigBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold ${getDignityBadgeClass(g.d9Dignity)}">${g.d9Dignity}</span>`;
+                    d9Tbody.innerHTML += `
+                        <tr class="hover:bg-celestial-700/30">
+                            <td class="p-2.5 font-bold text-slate-100">${g.name}</td>
+                            <td class="p-2.5 text-slate-400">${g.d1Rashi}</td>
+                            <td class="p-2.5">Pada ${g.d9Pada}</td>
+                            <td class="p-2.5 text-celestial-accentLight">${g.d9Rashi}</td>
+                            <td class="p-2.5 font-bold text-slate-200">H${g.d9House}</td>
+                            <td class="p-2.5">${d9DigBadge}</td>
+                            <td class="p-2.5">${vgBadge}</td>
+                        </tr>
+                    `;
+                }
+            });
+            let svgD9 = document.getElementById("svgD9ChartContainer");
+            if (svgD9) svgD9.innerHTML = renderNorthIndianChartSVG(d9HouseMap, data.d9LagnaIdx);
+
+            // 3. D-10 Dashamsha Chart rendering
+            let d10LagnaIdx = getD10RashiIndex(data.d1LagnaIdx, data.lagnaLon % 30);
+            let d10HouseMap = {};
+            for (let h = 1; h <= 12; h++) d10HouseMap[h] = [];
+            let d10Tbody = document.getElementById("d10GrahaTableBody");
+            if (d10Tbody) d10Tbody.innerHTML = "";
+
+            data.grahas.forEach(g => {
+                let d10RashiIdx = getD10RashiIndex(g.d1RashiIdx, g.degInSign);
+                let d10House = getWholeSignHouse(d10RashiIdx, d10LagnaIdx);
+                let d10Dignity = getDignity(g.name, d10RashiIdx, null);
+                d10HouseMap[d10House].push(g.name.substring(0,2));
+
+                if (d10Tbody) {
+                    let d10DigBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold ${getDignityBadgeClass(d10Dignity)}">${d10Dignity}</span>`;
+                    d10Tbody.innerHTML += `
+                        <tr class="hover:bg-celestial-700/30">
+                            <td class="p-2.5 font-bold text-slate-100">${g.name}</td>
+                            <td class="p-2.5 text-slate-400">${g.d1Rashi}</td>
+                            <td class="p-2.5 text-celestial-accentLight">${RASHIS[d10RashiIdx]}</td>
+                            <td class="p-2.5 font-bold text-slate-200">H${d10House}</td>
+                            <td class="p-2.5">${d10DigBadge}</td>
+                        </tr>
+                    `;
+                }
+            });
+            let svgD10 = document.getElementById("svgD10ChartContainer");
+            if (svgD10) svgD10.innerHTML = renderNorthIndianChartSVG(d10HouseMap, d10LagnaIdx);
+
+            // 4. Bhava Chalit rendering
+            let cuspsTbody = document.getElementById("houseCuspsTableBody");
+            if (cuspsTbody) {
+                cuspsTbody.innerHTML = "";
+                data.sidCusps.forEach((c, idx) => {
+                    let hNum = idx + 1;
+                    let rIdx = getRashiIndex(c);
+                    cuspsTbody.innerHTML += `
+                        <tr class="hover:bg-celestial-700/30">
+                            <td class="p-2 font-bold text-celestial-accent">House ${hNum}</td>
+                            <td class="p-2">${RASHIS[rIdx]}</td>
+                            <td class="p-2 font-mono text-slate-200">${formatDMS(c % 30)}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            let chalitTbody = document.getElementById("chalitShiftTableBody");
+            if (chalitTbody) {
+                chalitTbody.innerHTML = "";
+                data.grahas.forEach(g => {
+                    let shifted = g.d1House !== g.chalitHouse;
+                    let shiftBadge = shifted ? `<span class="px-2 py-0.5 rounded bg-celestial-purple text-white font-bold text-[10px]">Shifted</span>` : `<span class="text-slate-500">Same</span>`;
+                    let signStr = g.offset >= 0 ? "+" : "-";
+                    chalitTbody.innerHTML += `
+                        <tr class="hover:bg-celestial-700/30">
+                            <td class="p-2 font-bold text-slate-100">${g.name}</td>
+                            <td class="p-2">H${g.d1House}</td>
+                            <td class="p-2 font-bold text-celestial-accent">H${g.chalitHouse}</td>
+                            <td class="p-2 font-mono ${g.offset >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${signStr}${Math.abs(g.offset).toFixed(2)}°</td>
+                            <td class="p-2">${shiftBadge}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            // 5. Render Additional Engine Tabs
+            renderDoshaCards(data);
+            renderYogaCards(data);
+            renderGemstoneCards(data);
+            renderAshtakavargaTable('raw');
+            renderShodhyaPindaTable();
+            evaluateGochar();
+
+            // 6. Dasha Balance & Timeline
+            let dasha = data.dashaData;
+            let dashaHeader = document.getElementById("dashaBalanceHeader");
+            if (dashaHeader && dasha) {
+                dashaHeader.innerHTML = `
+                    <i class="fa-solid fa-moon text-celestial-accent mr-1"></i> Moon Nakshatra: <strong>${dasha.moonNakshatra.name}</strong> (Pada ${dasha.moonNakshatra.pada}, Lord: <strong>${dasha.moonNakshatra.lord}</strong>) 
+                    • Balance at Birth: <strong class="text-celestial-accentLight">${dasha.birthBalanceYears.toFixed(4)} Years</strong> (${(dasha.birthBalanceYears * 365.25).toFixed(1)} Days)
+                `;
+                renderMahadashaAccordion(dasha.mahadashas);
+                setDashaToday();
+            }
+        }
+
+        function renderNorthIndianChartSVG(housePlanetsMap, lagnaRashiIdx) {
+            const houseCoords = [
+                { rashi: [200, 140], planets: [200, 75] },
+                { rashi: [100, 40], planets: [80, 50] },
+                { rashi: [40, 100], planets: [50, 80] },
+                { rashi: [140, 200], planets: [75, 200] },
+                { rashi: [40, 300], planets: [50, 320] },
+                { rashi: [100, 360], planets: [80, 350] },
+                { rashi: [200, 260], planets: [200, 325] },
+                { rashi: [300, 360], planets: [320, 350] },
+                { rashi: [360, 300], planets: [350, 320] },
+                { rashi: [260, 200], planets: [325, 200] },
+                { rashi: [360, 100], planets: [350, 80] },
+                { rashi: [300, 40], planets: [320, 50] }
+            ];
+
+            let svgHTML = `
+            <svg viewBox="0 0 400 400" class="w-full h-full drop-shadow-md">
+                <rect x="10" y="10" width="380" height="380" class="chart-box" />
+                <line x1="10" y1="10" x2="390" y2="390" class="chart-line" />
+                <line x1="390" y1="10" x2="10" y2="390" class="chart-line" />
+                <polygon points="200,10 390,200 200,390 10,200" class="chart-line" fill="none" />
+            `;
+
+            for (let h = 1; h <= 12; h++) {
+                let rashiNum = ((lagnaRashiIdx + h - 1) % 12) + 1;
+                let coords = houseCoords[h - 1];
+                let pList = housePlanetsMap[h] || [];
+
+                svgHTML += `<text x="${coords.rashi[0]}" y="${coords.rashi[1]}" text-anchor="middle" class="chart-text-rashi">${rashiNum}</text>`;
+
+                if (pList.length > 0) {
+                    let pStr = pList.join(" ");
+                    svgHTML += `<text x="${coords.planets[0]}" y="${coords.planets[1]}" text-anchor="middle" class="chart-text-planet">${pStr}</text>`;
+                }
+            }
+
+            svgHTML += `</svg>`;
+            return svgHTML;
+        }
+
+        function renderMahadashaAccordion(mahadashas) {
+            let container = document.getElementById("mahadashaAccordion");
+            if (!container) return;
+            container.innerHTML = "";
+
+            mahadashas.forEach((md, idx) => {
+                let mdId = `md-item-${idx}`;
+                let tag = md.isBirthBalance ? `<span class="px-2 py-0.5 rounded text-[10px] bg-celestial-accent/20 text-celestial-accent border border-celestial-accent/30 font-bold ml-2">Birth Balance</span>` : '';
+
+                let adRows = md.antardashas.map(ad => `
+                    <div class="flex justify-between items-center py-1.5 px-3 bg-celestial-900/60 rounded-lg text-xs">
+                        <span class="font-semibold text-slate-200">AD: ${ad.lord}</span>
+                        <span class="font-mono text-slate-400">${ad.start.toISOString().split('T')[0]} → ${ad.end.toISOString().split('T')[0]}</span>
+                    </div>
+                `).join('');
+
+                container.innerHTML += `
+                    <div class="border border-celestial-700 rounded-xl overflow-hidden bg-celestial-900/30">
+                        <button onclick="toggleAccordion('${mdId}')" class="w-full px-4 py-3 text-left flex justify-between items-center hover:bg-celestial-700/40 transition">
+                            <div class="flex items-center">
+                                <span class="font-bold text-sm text-celestial-accent">${md.lord} Mahadasha</span>
+                                ${tag}
+                            </div>
+                            <div class="text-xs font-mono text-slate-300 flex items-center space-x-3">
+                                <span>${md.start.toISOString().split('T')[0]} → ${md.end.toISOString().split('T')[0]} (${md.durationYears.toFixed(1)} yrs)</span>
+                                <i class="fa-solid fa-chevron-down text-slate-400 transition-transform" id="${mdId}-icon"></i>
+                            </div>
+                        </button>
+                        <div id="${mdId}" class="hidden p-3 bg-celestial-800/40 border-t border-celestial-700/60 space-y-1.5">
+                            ${adRows}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function toggleAccordion(id) {
+            let el = document.getElementById(id);
+            let icon = document.getElementById(id + "-icon");
+            if (el.classList.contains("hidden")) {
+                el.classList.remove("hidden");
+                icon.classList.add("rotate-180");
+            } else {
+                el.classList.add("hidden");
+                icon.classList.remove("rotate-180");
+            }
+        }
+
+        function setDashaToday() {
+            let dtInput = document.getElementById("dashaTargetDate");
+            if (dtInput) dtInput.value = "2026-11-25T12:00";
+            lookupDashaDate();
+        }
+
+        function lookupDashaDate() {
+            if (!currentCalculatedData) return;
+            let valInput = document.getElementById("dashaTargetDate");
+            if (!valInput || !valInput.value) return;
+
+            let targetDt = new Date(valInput.value);
+            let active = resolveActiveDasha(currentCalculatedData.dashaData, targetDt);
+            let card = document.getElementById("activeDashaCard");
+            if (!card) return;
+            card.classList.remove("hidden");
+
+            if (!active) {
+                card.innerHTML = `<div class="col-span-5 text-rose-400 text-xs">Target date falls outside computed 120-year Vimshottari cycle.</div>`;
+                return;
+            }
+
+            let formatTime = (d) => d.toISOString().replace('T', ' ').substring(0, 16);
+
+            card.innerHTML = `
+                <div class="p-2 rounded bg-celestial-800/80 border border-celestial-700">
+                    <div class="text-[10px] uppercase text-slate-400 font-cinzel">Mahadasha</div>
+                    <div class="font-bold text-celestial-accent text-sm">${active.md.lord}</div>
+                    <div class="text-[9px] font-mono text-slate-400 mt-1">${formatTime(active.md.start)}</div>
+                </div>
+                <div class="p-2 rounded bg-celestial-800/80 border border-celestial-700">
+                    <div class="text-[10px] uppercase text-slate-400 font-cinzel">Antardasha</div>
+                    <div class="font-bold text-celestial-accentLight text-sm">${active.ad ? active.ad.lord : '-'}</div>
+                    <div class="text-[9px] font-mono text-slate-400 mt-1">${active.ad ? formatTime(active.ad.start) : ''}</div>
+                </div>
+            `;
+        }
+
+        function switchAvTable(type) {
+            ['raw', 'trikona', 'final'].forEach(t => {
+                let btn = document.getElementById(`btn-av-${t}`);
+                if (btn) {
+                    btn.className = (t === type) ? "px-3 py-1 text-xs font-semibold rounded-lg bg-celestial-700 text-celestial-accent" : "px-3 py-1 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-200";
+                }
+            });
+            renderAshtakavargaTable(type);
+        }
+
+        function renderAshtakavargaTable(type) {
+            if (!currentCalculatedData || !currentCalculatedData.ashtakavarga) return;
+            let av = currentCalculatedData.ashtakavarga;
+            let lagnaIdx = currentCalculatedData.d1LagnaIdx;
+
+            let headerRow = document.getElementById("avTableHeaderRow");
+            if (!headerRow) return;
+            headerRow.innerHTML = `<th class="p-2 text-left">Planet</th>`;
+            for (let h = 0; h < 12; h++) {
+                let sIdx = (lagnaIdx + h) % 12;
+                let sName = RASHIS[sIdx].split(' ')[0].substring(0,3);
+                headerRow.innerHTML += `<th class="p-2 text-center">H${h+1}<br><span class="text-[9px] text-slate-400">${sName}</span></th>`;
+            }
+            headerRow.innerHTML += `<th class="p-2 text-center font-bold">Total</th>`;
+
+            let dataSource = (type === 'raw') ? av.rawBavHouse : (type === 'trikona' ? av.trikonaBavHouse : av.finalBavHouse);
+            let totalsSource = (type === 'raw') ? av.rawTotals : (type === 'trikona' ? av.trikonaTotals : av.finalTotals);
+            let savSource = (type === 'raw') ? av.savRawHouse : (type === 'trikona' ? av.savTrikonaByHouse || av.savRawHouse : av.savFinalHouse);
+            let savTotal = (type === 'raw') ? av.savRawTotal : av.savFinalTotal;
+
+            let tbody = document.getElementById("avTableBody");
+            if (!tbody) return;
+            tbody.innerHTML = "";
+
+            ASHTAKAVARGA_PLANETS.forEach(p => {
+                let rowHTML = `<td class="p-2 font-bold text-slate-100 text-left">${p}</td>`;
+                dataSource[p].forEach(val => {
+                    let cls = val >= 4 ? "text-emerald-400 font-bold" : "text-slate-300";
+                    rowHTML += `<td class="p-2 ${cls}">${val}</td>`;
+                });
+                rowHTML += `<td class="p-2 font-bold text-celestial-accent">${totalsSource[p]}</td>`;
+                tbody.innerHTML += `<tr class="hover:bg-celestial-700/30">${rowHTML}</tr>`;
+            });
+
+            let savRowHTML = `<td class="p-2 font-bold text-celestial-accentLight text-left">SAV Total</td>`;
+            savSource.forEach(val => {
+                let cls = val >= 30 ? "text-emerald-400 font-bold" : (val < 25 ? "text-rose-400" : "text-slate-200");
+                savRowHTML += `<td class="p-2 ${cls}">${val}</td>`;
+            });
+            savRowHTML += `<td class="p-2 font-bold text-celestial-accent">${savTotal}</td>`;
+            tbody.innerHTML += `<tr class="bg-celestial-900/80 border-t border-celestial-700 font-bold">${savRowHTML}</tr>`;
+        }
+
+        function renderShodhyaPindaTable() {
+            if (!currentCalculatedData || !currentCalculatedData.ashtakavarga) return;
+            let sp = currentCalculatedData.ashtakavarga.shodhyaPindas;
+            let finalTotals = currentCalculatedData.ashtakavarga.finalTotals;
+            let tbody = document.getElementById("shodhyaPindaTableBody");
+            if (!tbody) return;
+            tbody.innerHTML = "";
+
+            ASHTAKAVARGA_PLANETS.forEach(p => {
+                let rec = sp[p];
+                tbody.innerHTML += `
+                    <tr class="hover:bg-celestial-700/30">
+                        <td class="p-2.5 font-bold text-slate-100">${p}</td>
+                        <td class="p-2.5 font-mono text-slate-300">${finalTotals[p]}</td>
+                        <td class="p-2.5 font-mono text-slate-300">${rec.rashiPinda}</td>
+                        <td class="p-2.5 font-mono text-slate-300">${rec.grahaPinda}</td>
+                        <td class="p-2.5 font-bold font-mono text-celestial-accent">${rec.shodhyaPinda}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function evaluateGochar() {
+            if (!currentCalculatedData) return;
+            let dateInput = document.getElementById("gocharInputDate");
+            if (!dateInput || !dateInput.value) return;
+
+            let tDate = new Date(dateInput.value);
+            let tYear = tDate.getFullYear();
+            let tMonth = tDate.getMonth() + 1;
+            let tDay = tDate.getDate();
+            let tJdUT = getJulianDayUT(tYear, tMonth, tDay, 12.0);
+
+            let astro = calculateSiderealLongitudes(tJdUT, currentCalculatedData.lat, currentCalculatedData.lon);
+            let natalLagnaIdx = currentCalculatedData.d1LagnaIdx;
+            let natalMoonIdx = currentCalculatedData.moonRashiIdx;
+
+            let av = currentCalculatedData.ashtakavarga;
+            let tbody = document.getElementById("gocharTableBody");
+            if (!tbody) return;
+            tbody.innerHTML = "";
+
+            GRAHA_NAMES.forEach(name => {
+                let sidLon = astro.planets[name];
+                let tSignIdx = getRashiIndex(sidLon);
+                let degInSign = sidLon % 30.0;
+                let hLagna = getWholeSignHouse(tSignIdx, natalLagnaIdx);
+                let hMoon = getWholeSignHouse(tSignIdx, natalMoonIdx);
+
+                let hasBav = ASHTAKAVARGA_PLANETS.includes(name);
+                let ownBav = hasBav ? av.rawBavSign[name][tSignIdx] : '-';
+                let savVal = av.savRawSign[tSignIdx];
+
+                let verdict = "";
+                let badgeClass = "";
+                if (hasBav) {
+                    if (ownBav >= 4 && savVal >= 28) {
+                        verdict = "Strong Favorable Transit";
+                        badgeClass = "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
+                    } else if (ownBav >= 4 || savVal >= 28) {
+                        verdict = "Moderate / Supportive";
+                        badgeClass = "bg-blue-500/20 text-blue-300 border border-blue-500/40";
+                    } else {
+                        verdict = "Challenging / Low Bindus";
+                        badgeClass = "bg-rose-500/20 text-rose-300 border border-rose-500/40";
+                    }
+                } else {
+                    if (savVal >= 30) {
+                        verdict = "Strong SAV Support";
+                        badgeClass = "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
+                    } else {
+                        verdict = "Moderate SAV";
+                        badgeClass = "bg-slate-700/50 text-slate-300";
+                    }
+                }
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-celestial-700/30">
+                        <td class="p-2.5 font-bold text-slate-100">${name}</td>
+                        <td class="p-2.5">${RASHIS[tSignIdx]}</td>
+                        <td class="p-2.5 font-mono text-celestial-accentLight">${formatDMS(degInSign)}</td>
+                        <td class="p-2.5 font-bold text-slate-200">H${hLagna}</td>
+                        <td class="p-2.5 font-bold text-celestial-accent">H${hMoon}</td>
+                        <td class="p-2.5 font-bold ${ownBav >= 4 ? 'text-emerald-400' : 'text-slate-400'}">${ownBav}</td>
+                        <td class="p-2.5 font-bold ${savVal >= 30 ? 'text-emerald-400' : (savVal < 25 ? 'text-rose-400' : 'text-slate-200')}">${savVal}</td>
+                        <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeClass}">${verdict}</span></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function calculateFullKundaliData(year, month, day, hourLocal, lat, lon, tzOffsetHours) {
+            let localDt = new Date(year, month - 1, day, Math.floor(hourLocal), Math.floor((hourLocal % 1) * 60));
+            let hourUT = hourLocal - tzOffsetHours;
+            let jdUT = getJulianDayUT(year, month, day, hourUT);
+
+            let astro = calculateSiderealLongitudes(jdUT, lat, lon);
+            let d1LagnaIdx = getRashiIndex(astro.ascendant);
+            let d9LagnaInfo = getNavamshaInfo(astro.ascendant);
+
+            let grahaRecords = [];
+            let contributorSigns = { "Lagna": d1LagnaIdx };
+            let occupiedSigns = new Set();
+            let moonRashiIdx = null;
+
+            GRAHA_NAMES.forEach(name => {
+                let sidLon = astro.planets[name];
+                let degInSign = sidLon % 30.0;
+                let d1RashiIdx = getRashiIndex(sidLon);
+                occupiedSigns.add(d1RashiIdx);
+
+                if (ASHTAKAVARGA_PLANETS.includes(name)) {
+                    contributorSigns[name] = d1RashiIdx;
+                }
+                if (name === "Moon") moonRashiIdx = d1RashiIdx;
+
+                let d1House = getWholeSignHouse(d1RashiIdx, d1LagnaIdx);
+                let nak = getNakshatraInfo(sidLon);
+                let nav = getNavamshaInfo(sidLon);
+                let d9House = getWholeSignHouse(nav.d9RashiIdx, d9LagnaInfo.d9RashiIdx);
+
+                let d1Dignity = getDignity(name, d1RashiIdx, degInSign);
+                let d9Dignity = getDignity(name, nav.d9RashiIdx, null);
+
+                grahaRecords.push({
+                    name, sidLon, degInSign, d1RashiIdx, d1Rashi: RASHIS[d1RashiIdx],
+                    d1House, d1Dignity, nakshatra: nak, d9Pada: nav.pada,
+                    d9RashiIdx: nav.d9RashiIdx, d9Rashi: nav.d9Rashi, d9House,
+                    d9Dignity, vargottama: nav.vargottama
+                });
+            });
+
+            let sidCusps = [];
+            for (let h = 0; h < 12; h++) {
+                sidCusps.push(norm360(astro.ascendant + (h * 30.0)));
+            }
+
+            let chalitRecords = grahaRecords.map(g => {
+                let chalitHouse = getWholeSignHouse(g.d1RashiIdx, d1LagnaIdx);
+                let cuspCenter = sidCusps[chalitHouse - 1];
+                let offset = ((g.sidLon - cuspCenter + 180.0) % 360.0) - 180.0;
+                return { ...g, chalitHouse, cuspCenter, offset };
+            });
+
+            let dashaData = computeVimshottariDashas(astro.planets["Moon"], localDt);
+            let ashtakavarga = computeAshtakavargaEngine(contributorSigns, d1LagnaIdx, occupiedSigns);
+
+            return {
+                localDt, jdUT, ayanamsa: astro.ayanamsa, lat, lon, tzOffsetHours,
+                d1LagnaIdx, d1Lagna: RASHIS[d1LagnaIdx], lagnaLon: astro.ascendant,
+                d9LagnaIdx: d9LagnaInfo.d9RashiIdx, d9Lagna: d9LagnaInfo.d9Rashi,
+                moonRashiIdx, moonRashi: RASHIS[moonRashiIdx],
+                grahas: chalitRecords, sidCusps, dashaData, ashtakavarga
+            };
+        }
+
+        function handleBirthDetailsSubmit(e) {
+            if (e) e.preventDefault();
+            let dateStr = document.getElementById("inputDate").value;
+            let timeStr = document.getElementById("inputTime").value;
+            let lat = parseFloat(document.getElementById("inputLat").value);
+            let lon = parseFloat(document.getElementById("inputLon").value);
+            let tz = parseFloat(document.getElementById("inputTz").value);
+
+            let [year, month, day] = dateStr.split('-').map(Number);
+            let timeParts = timeStr.split(':').map(Number);
+            let hourDecimal = timeParts[0] + (timeParts[1] / 60.0) + ((timeParts[2] || 0) / 3600.0);
+
+            let fullData = calculateFullKundaliData(year, month, day, hourDecimal, lat, lon, tz);
+            renderCalculatedData(fullData);
+        }
+
+        function loadSamplePreset() {
+            document.getElementById("inputName").value = "Sri Vikramaditya";
+            document.getElementById("inputDate").value = "1992-01-09";
+            document.getElementById("inputTime").value = "14:30:00";
+            document.getElementById("inputLat").value = "28.6139";
+            document.getElementById("inputLon").value = "77.2090";
+            document.getElementById("inputTz").value = "5.5";
+            handleBirthDetailsSubmit(null);
+        }
+
+        window.addEventListener("DOMContentLoaded", () => {
+            renderTransitCards();
+            if (typeof window.switchHorizon === 'function') {
+                window.switchHorizon('1Y');
+            }
+            handleBirthDetailsSubmit(null);
         });
-        html += `</div>`;
-      }
-
-      chartContainer.innerHTML = html;
-    }
-
-    function inspectHouse(hNum) {
-      if (!currentData) return;
-      const h = currentData.housesMap[hNum];
-      document.getElementById('houseInspector').innerHTML = `
-        <div class="flex items-center justify-between font-bold text-cosmic-gold mb-1">
-          <span>House ${h.houseNum} (${h.signName} / ${h.signSanskrit})</span>
-          <span class="text-slate-400 font-normal">Ruler: ${h.ruler}</span>
-        </div>
-        <p>Occupants: <strong class="text-amber-200">${h.occupants.join(', ') || 'Unoccupied'}</strong></p>
-      `;
-    }
-
-    function renderPlanetaryTable() {
-      document.getElementById('planetaryTableBody').innerHTML = currentData.planets.map(p => `
-        <tr class="hover:bg-purple-950/20 transition">
-          <td class="py-2 px-3 font-bold text-cosmic-gold">${p.name}</td>
-          <td class="py-2 px-3">${p.signName}</td>
-          <td class="py-2 px-3 font-mono">${p.degFormatted}</td>
-          <td class="py-2 px-3">${p.nakshatra} <span class="text-slate-500">(P${p.pada})</span></td>
-          <td class="py-2 px-3 font-bold text-slate-300">House ${p.house}</td>
-        </tr>
-      `).join('');
-    }
-
-    function renderDashaTable() {
-      const curYear = new Date().getFullYear();
-      document.getElementById('dashaTableBody').innerHTML = currentData.dashaList.map(d => {
-        const isCur = curYear >= d.startYear && curYear <= d.endYear;
-        return `
-          <tr class="${isCur ? 'bg-amber-500/15 font-bold text-cosmic-gold' : 'hover:bg-slate-800/40'}">
-            <td class="py-2 px-3">${d.lord}</td>
-            <td class="py-2 px-3">${d.duration} Yrs</td>
-            <td class="py-2 px-3">${d.startYear}</td>
-            <td class="py-2 px-3">${d.endYear}</td>
-            <td class="py-2 px-3">${isCur ? '<span class="px-2 py-0.5 rounded bg-cosmic-gold text-cosmic-900 font-bold text-[10px]">Active</span>' : ''}</td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function renderRashiphal() {
-      const curYr = new Date().getFullYear();
-      document.getElementById('rashiphalSummary').innerHTML = `
-        You are born under <strong>${currentData.lagnaSign} Lagna</strong> with Moon in <strong>${currentData.moonNakshatra} Nakshatra</strong> (${currentData.moonSign}).
-        Your primary ruling planet is <strong>${currentData.lagnaRuler}</strong>. This placement drives high analytical stamina, original enterprise, and independent ambition.
-      `;
-
-      // Dynamic timeline dates update
-      document.getElementById('dashaPhase1').innerText = `Active Phase (${curYr} – ${curYr + 1})`;
-      document.getElementById('dashaPhase5').innerText = `Master Horizon (${curYr + 1} – ${curYr + 5})`;
-      document.getElementById('dashaPhase10').innerText = `Legacy Era (${curYr + 5} – ${curYr + 10})`;
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      calculateChart();
-    });
-  </script>
+    </script>
 </body>
 </html>
