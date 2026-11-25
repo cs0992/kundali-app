@@ -121,7 +121,7 @@
                     <i class="fa-solid fa-sliders text-celestial-accent"></i> ENTER BIRTH DETAILS & NATIVE NAME (जन्म विवरण व नाम दर्ज करें)
                 </h3>
                 <button type="button" onclick="loadSamplePreset()" class="px-2.5 py-1 text-xs font-medium rounded-lg bg-celestial-700 hover:bg-celestial-600 border border-celestial-600 text-celestial-accentLight transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-rotate-left"></i> Reset Sample (09-Jan-1992)
+                    <i class="fa-solid fa-rotate-left"></i> Reset Sample (New Delhi)
                 </button>
             </div>
             <form id="kundaliInputForm" onsubmit="handleBirthDetailsSubmit(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4 items-end">
@@ -137,16 +137,31 @@
                     <label class="block text-xs font-medium text-slate-400 mb-1"><i class="fa-solid fa-clock text-celestial-accent mr-1"></i> Time of Birth (Local)</label>
                     <input type="time" id="inputTime" step="1" value="14:30:00" required class="w-full bg-celestial-900 border border-celestial-600 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-celestial-accent">
                 </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1"><i class="fa-solid fa-globe text-celestial-accent mr-1"></i> Latitude (°N)</label>
-                    <input type="number" id="inputLat" step="0.0001" value="28.6139" required class="w-full bg-celestial-900 border border-celestial-600 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-celestial-accent">
+                <div class="lg:col-span-2">
+                    <label class="block text-xs font-medium text-slate-400 mb-1"><i class="fa-solid fa-location-dot text-celestial-accent mr-1"></i> Birth City / Place</label>
+                    <select id="inputCitySelect" onchange="onCitySelectChange()" class="w-full bg-celestial-900 border border-celestial-600 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-celestial-accent">
+                        <option value="28.6139,77.2090,5.5">New Delhi / NCR, India</option>
+                        <option value="19.0760,72.8777,5.5">Mumbai, Maharashtra, India</option>
+                        <option value="12.9716,77.5946,5.5">Bengaluru, Karnataka, India</option>
+                        <option value="18.5204,73.8567,5.5">Pune, Maharashtra, India</option>
+                        <option value="25.2630,73.0480,5.5">Bisalpur / Pali, Rajasthan, India</option>
+                        <option value="26.9124,75.7873,5.5">Jaipur, Rajasthan, India</option>
+                        <option value="28.4595,77.0266,5.5">Gurgaon / Gurugram, Haryana, India</option>
+                        <option value="22.5726,88.3639,5.5">Kolkata, West Bengal, India</option>
+                        <option value="13.0827,80.2707,5.5">Chennai, Tamil Nadu, India</option>
+                        <option value="17.3850,78.4867,5.5">Hyderabad, Telangana, India</option>
+                        <option value="23.0225,72.5714,5.5">Ahmedabad, Gujarat, India</option>
+                        <option value="25.2048,55.2708,4.0">Dubai, UAE</option>
+                        <option value="51.5074,-0.1278,0.0">London, UK</option>
+                        <option value="40.7128,-74.0060,-5.0">New York, USA</option>
+                        <option value="1.3521,103.8198,8.0">Singapore</option>
+                    </select>
+                    <!-- Hidden Lat / Lon inputs maintained for calculation engine -->
+                    <input type="hidden" id="inputLat" value="28.6139">
+                    <input type="hidden" id="inputLon" value="77.2090">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1"><i class="fa-solid fa-location-dot text-celestial-accent mr-1"></i> Longitude (°E)</label>
-                    <input type="number" id="inputLon" step="0.0001" value="77.2090" required class="w-full bg-celestial-900 border border-celestial-600 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-celestial-accent">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1"><i class="fa-solid fa-stopwatch text-celestial-accent mr-1"></i> Timezone Offset (Hrs)</label>
+                    <label class="block text-xs font-medium text-slate-400 mb-1"><i class="fa-solid fa-stopwatch text-celestial-accent mr-1"></i> Timezone (UTC)</label>
                     <input type="number" id="inputTz" step="0.1" value="5.5" required class="w-full bg-celestial-900 border border-celestial-600 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-celestial-accent">
                 </div>
                 <div>
@@ -1606,6 +1621,50 @@
             document.getElementById("inputLat").value = "28.6139";
             document.getElementById("inputLon").value = "77.2090";
             document.getElementById("inputTz").value = "5.5";
+            handleBirthDetailsSubmit(null);
+        }
+
+        window.addEventListener("DOMContentLoaded", () => {
+            renderTransitCards();
+            if (typeof window.switchHorizon === 'function') {
+                window.switchHorizon('1Y');
+            }
+            handleBirthDetailsSubmit(null);
+        });
+    </script>
+</body>
+        function onCitySelectChange() {
+            let citySelect = document.getElementById("inputCitySelect");
+            if (!citySelect) return;
+            let [lat, lon, tz] = citySelect.value.split(',').map(Number);
+            document.getElementById("inputLat").value = lat;
+            document.getElementById("inputLon").value = lon;
+            document.getElementById("inputTz").value = tz;
+        }
+
+        function handleBirthDetailsSubmit(e) {
+            if (e) e.preventDefault();
+            onCitySelectChange(); // ensure hidden lat/lon match current city selection
+            let dateStr = document.getElementById("inputDate").value;
+            let timeStr = document.getElementById("inputTime").value;
+            let lat = parseFloat(document.getElementById("inputLat").value);
+            let lon = parseFloat(document.getElementById("inputLon").value);
+            let tz = parseFloat(document.getElementById("inputTz").value);
+
+            let [year, month, day] = dateStr.split('-').map(Number);
+            let timeParts = timeStr.split(':').map(Number);
+            let hourDecimal = timeParts[0] + (timeParts[1] / 60.0) + ((timeParts[2] || 0) / 3600.0);
+
+            let fullData = calculateFullKundaliData(year, month, day, hourDecimal, lat, lon, tz);
+            renderCalculatedData(fullData);
+        }
+
+        function loadSamplePreset() {
+            document.getElementById("inputName").value = "Sri Vikramaditya";
+            document.getElementById("inputDate").value = "1992-01-09";
+            document.getElementById("inputTime").value = "14:30:00";
+            document.getElementById("inputCitySelect").value = "28.6139,77.2090,5.5";
+            onCitySelectChange();
             handleBirthDetailsSubmit(null);
         }
 
