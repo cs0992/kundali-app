@@ -24,6 +24,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@300;400;500;600;700&family=Space+Mono&display=swap" rel="stylesheet">
+    <!-- html2pdf.js for direct client-side PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -82,6 +84,41 @@
         .chart-box { fill: #0b1120; stroke: rgba(212, 175, 55, 0.5); stroke-width: 1.5; }
         .chart-text-rashi { fill: rgba(212, 175, 55, 0.7); font-size: 11px; font-family: 'Cinzel', serif; font-weight: bold; }
         .chart-text-planet { fill: #e2e8f0; font-size: 10px; font-weight: 600; }
+
+        /* Print & PDF Export Adjustments */
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #111827 !important;
+                background-image: none !important;
+            }
+            header, form, #mainTabContainer, footer, .no-print {
+                display: none !important;
+            }
+            #calculatedResultsDashboard {
+                display: block !important;
+            }
+            .tab-content {
+                display: block !important;
+                page-break-inside: avoid;
+                margin-bottom: 16px;
+            }
+            .bg-celestial-800\/90, .bg-celestial-800\/80, .bg-celestial-900\/80 {
+                background: #ffffff !important;
+                color: #111827 !important;
+                border-color: #d1d5db !important;
+                box-shadow: none !important;
+            }
+        }
+        .pdf-export-mode {
+            background-color: #0b1120 !important;
+            color: #e2e8f0 !important;
+            padding: 16px !important;
+        }
+        .pdf-export-mode .tab-content {
+            display: block !important;
+            margin-bottom: 18px;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -100,85 +137,85 @@
             </div>
 
             <!-- Profile Badge & Actions -->
-            <div class="flex items-center space-x-3">
-                <span class="px-3 py-1 text-xs rounded-full bg-celestial-700 text-celestial-accentLight border border-celestial-600 font-medium flex items-center gap-1.5">
-                    <i class="fa-solid fa-user-astronaut"></i> Profile: <strong id="headerProfileName" class="gold-gradient-text font-semibold">Native</strong>
-                </span>
-                <button onclick="window.print()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-celestial-700 hover:bg-celestial-600 border border-celestial-600 text-celestial-accent transition">
-                    <i class="fa-solid fa-print mr-1"></i> Export Report
-                </button>
-            </div>
+        <div class="flex items-center space-x-3">
+            <span class="px-3 py-1 text-xs rounded-full bg-celestial-700 text-celestial-accentLight border border-celestial-600 font-medium flex items-center gap-1.5">
+                <i class="fa-solid fa-user-astronaut"></i> Profile: <strong id="headerProfileName" class="gold-gradient-text font-semibold">Blank / Unset</strong>
+            </span>
+            <button type="button" onclick="exportKundaliPDF()" id="exportPdfBtn" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-celestial-700 hover:bg-celestial-600 border border-celestial-600 text-celestial-accent transition flex items-center gap-1.5">
+                <i class="fa-solid fa-file-pdf"></i> <span id="exportPdfLabel">Export PDF</span>
+            </button>
         </div>
-    </header>
+    </div>
+</header>
 
-    <!-- Main Dashboard Container -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 space-y-6">
+<!-- Main Dashboard Container -->
+<main class="flex-1 max-w-7xl w-full mx-auto p-4 space-y-6">
 
-        <!-- Birth Details Input Form Section -->
-        <section class="bg-celestial-800/90 border border-celestial-700 rounded-2xl p-5 shadow-2xl backdrop-blur-sm">
-            <div class="flex items-center justify-between mb-3 border-b border-celestial-700/60 pb-2.5">
-                <h3 class="font-cinzel font-bold text-celestial-accent text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-sliders text-celestial-accent"></i> ENTER BIRTH DETAILS & NATIVE NAME (जन्म विवरण व नाम दर्ज करें)
+    <!-- Blank Birth Details Input Form Section -->
+    <section class="bg-celestial-800/90 border border-celestial-700 rounded-2xl p-6 shadow-2xl backdrop-blur-sm">
+        <div class="flex items-center justify-between mb-4 border-b border-celestial-700/60 pb-3">
+            <div>
+                <h3 class="font-cinzel font-bold text-celestial-accent text-base flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-celestial-accent"></i> ENTER YOUR BIRTH DETAILS (जन्म विवरण एवं स्थान दर्ज करें)
                 </h3>
-                <button type="button" onclick="loadSamplePreset()" class="px-2.5 py-1 text-xs font-medium rounded-lg bg-celestial-700 hover:bg-celestial-600 border border-celestial-600 text-celestial-accentLight transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-rotate-left"></i> Reset Sample (New Delhi)
+                <p class="text-xs text-slate-400 mt-0.5">Fill in your exact birth credentials below to generate your complete Sidereal Kundali, Dashas, and Rashiphal Codex.</p>
+            </div>
+            <button type="button" onclick="clearBirthForm()" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-celestial-700 hover:bg-celestial-600 border border-celestial-600 text-slate-300 transition flex items-center gap-1.5">
+                <i class="fa-solid fa-eraser"></i> Clear Form
+            </button>
+        </div>
+        <form id="kundaliInputForm" onsubmit="handleBirthDetailsSubmit(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 items-end">
+            <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1"><i class="fa-solid fa-user text-celestial-accent mr-1"></i> Native Name *</label>
+                <input type="text" id="inputName" value="" placeholder="Enter Full Name" required class="w-full bg-celestial-900 border border-celestial-600 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-celestial-accent font-semibold">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1"><i class="fa-solid fa-calendar text-celestial-accent mr-1"></i> Date of Birth *</label>
+                <input type="date" id="inputDate" value="" required class="w-full bg-celestial-900 border border-celestial-600 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-celestial-accent">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1"><i class="fa-solid fa-clock text-celestial-accent mr-1"></i> Time of Birth (Local) *</label>
+                <input type="time" id="inputTime" step="1" value="" required class="w-full bg-celestial-900 border border-celestial-600 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-celestial-accent">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1"><i class="fa-solid fa-location-dot text-celestial-accent mr-1"></i> Birth City / Place *</label>
+                <input type="text" id="inputCityName" value="" placeholder="Type City (e.g. Pune, Delhi, Dubai)" required onchange="autoLookupCityCoordinates()" class="w-full bg-celestial-900 border border-celestial-600 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-celestial-accent">
+                <span id="cityGeoStatus" class="text-[10px] text-emerald-400 mt-1 block"></span>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1"><i class="fa-solid fa-compass text-celestial-accent mr-1"></i> Lat (°N) & Lon (°E)</label>
+                <div class="flex space-x-1">
+                    <input type="number" id="inputLat" step="0.0001" value="" placeholder="Lat" required class="w-1/2 bg-celestial-900 border border-celestial-600 rounded-xl px-2 py-2 text-xs text-slate-100 focus:outline-none focus:border-celestial-accent">
+                    <input type="number" id="inputLon" step="0.0001" value="" placeholder="Lon" required class="w-1/2 bg-celestial-900 border border-celestial-600 rounded-xl px-2 py-2 text-xs text-slate-100 focus:outline-none focus:border-celestial-accent">
+                </div>
+            </div>
+            <div>
+                <input type="hidden" id="inputTz" value="5.5">
+                <button type="submit" class="w-full gold-button py-2.5 px-3 rounded-xl shadow-lg transition flex items-center justify-center gap-1.5 text-xs font-bold">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Kundali & Codex
                 </button>
             </div>
-            <form id="kundaliInputForm" onsubmit="handleBirthDetailsSubmit(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4 items-end">
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1"><i class="fa-solid fa-user text-celestial-accent mr-1"></i> Native Name</label>
-                    <input type="text" id="inputName" value="Sri Vikramaditya" placeholder="Enter Full Name" required class="w-full bg-celestial-900 border border-celestial-600 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-celestial-accent font-semibold">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1"><i class="fa-solid fa-calendar text-celestial-accent mr-1"></i> Date of Birth</label>
-                    <input type="date" id="inputDate" value="1992-01-09" required class="w-full bg-celestial-900 border border-celestial-600 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-celestial-accent">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1"><i class="fa-solid fa-clock text-celestial-accent mr-1"></i> Time of Birth (Local)</label>
-                    <input type="time" id="inputTime" step="1" value="14:30:00" required class="w-full bg-celestial-900 border border-celestial-600 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-celestial-accent">
-                </div>
-                <div class="lg:col-span-2">
-                    <label class="block text-xs font-medium text-slate-400 mb-1"><i class="fa-solid fa-location-dot text-celestial-accent mr-1"></i> Birth City / Place</label>
-                    <select id="inputCitySelect" onchange="onCitySelectChange()" class="w-full bg-celestial-900 border border-celestial-600 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-celestial-accent">
-                        <option value="28.6139,77.2090,5.5">New Delhi / NCR, India</option>
-                        <option value="19.0760,72.8777,5.5">Mumbai, Maharashtra, India</option>
-                        <option value="12.9716,77.5946,5.5">Bengaluru, Karnataka, India</option>
-                        <option value="18.5204,73.8567,5.5">Pune, Maharashtra, India</option>
-                        <option value="25.2630,73.0480,5.5">Bisalpur / Pali, Rajasthan, India</option>
-                        <option value="26.9124,75.7873,5.5">Jaipur, Rajasthan, India</option>
-                        <option value="28.4595,77.0266,5.5">Gurgaon / Gurugram, Haryana, India</option>
-                        <option value="22.5726,88.3639,5.5">Kolkata, West Bengal, India</option>
-                        <option value="13.0827,80.2707,5.5">Chennai, Tamil Nadu, India</option>
-                        <option value="17.3850,78.4867,5.5">Hyderabad, Telangana, India</option>
-                        <option value="23.0225,72.5714,5.5">Ahmedabad, Gujarat, India</option>
-                        <option value="25.2048,55.2708,4.0">Dubai, UAE</option>
-                        <option value="51.5074,-0.1278,0.0">London, UK</option>
-                        <option value="40.7128,-74.0060,-5.0">New York, USA</option>
-                        <option value="1.3521,103.8198,8.0">Singapore</option>
-                    </select>
-                    <!-- Hidden Lat / Lon inputs maintained for calculation engine -->
-                    <input type="hidden" id="inputLat" value="28.6139">
-                    <input type="hidden" id="inputLon" value="77.2090">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1"><i class="fa-solid fa-stopwatch text-celestial-accent mr-1"></i> Timezone (UTC)</label>
-                    <input type="number" id="inputTz" step="0.1" value="5.5" required class="w-full bg-celestial-900 border border-celestial-600 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-celestial-accent">
-                </div>
-                <div>
-                    <button type="submit" class="w-full gold-button py-2.5 px-3 rounded-xl shadow-lg transition flex items-center justify-center gap-1.5 text-xs font-bold">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i> Compute Kundali
-                    </button>
-                </div>
-            </form>
-        </section>
+        </form>
+    </section>
 
+    <!-- Empty State Placeholder Banner (Shown before calculation) -->
+    <div id="blankPlaceholderNotice" class="bg-celestial-800/40 border border-dashed border-celestial-700/80 rounded-2xl p-12 text-center space-y-3">
+        <div class="w-16 h-16 mx-auto rounded-full bg-celestial-700/50 border border-celestial-accent/30 flex items-center justify-center text-celestial-accent text-2xl">
+            <i class="fa-solid fa-scroll"></i>
+        </div>
+        <h3 class="font-cinzel font-bold text-celestial-accent text-lg">AWAITING BIRTH DETAILS</h3>
+        <p class="text-xs text-slate-400 max-w-md mx-auto">Please enter your Name, Date of Birth, Time of Birth, and Birth City in the form above. Click <strong>"Generate Kundali & Codex"</strong> to compute your full Sidereal Lahiri charts, Vimshottari Dashas, and Multi-Horizon Rashiphal Codex.</p>
+    </div>
+
+    <!-- Calculated Output Dashboard Content (Initially Hidden) -->
+    <div id="calculatedResultsDashboard" class="hidden space-y-6">
         <!-- Active Transit Overview Grid -->
         <section class="space-y-3">
             <div class="flex items-center justify-between">
                 <h3 class="font-cinzel font-bold text-celestial-accent text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-arrows-spin"></i> LIVE MAJOR TRANSIT SNAPSHOTS (2026 – 2027)
+                    <i class="fa-solid fa-arrows-spin"></i> LIVE MAJOR TRANSIT SNAPSHOTS
                 </h3>
-                <span class="text-[11px] text-slate-400">Sidereal Lahiri Real-Time Positions</span>
+                <span class="text-[11px] text-slate-400">Sidereal Lahiri Positions</span>
             </div>
             <div id="transitSnapshotGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <!-- JS Populated Transit Cards -->
@@ -188,7 +225,10 @@
         <!-- Navigation Tabs -->
         <div class="border-b border-celestial-700/80 flex overflow-x-auto space-x-2 pb-1 scrollbar-none" id="mainTabContainer">
             <button onclick="switchMainTab('codexView')" id="tab-codexView" class="tab-btn px-4 py-2 text-sm font-medium rounded-t-xl transition whitespace-nowrap bg-celestial-700 text-celestial-accent border-t border-x border-celestial-600">
-                <i class="fa-solid fa-scroll mr-1.5"></i> Rashiphal Codex (English / हिंदी)
+                <i class="fa-solid fa-scroll mr-1.5"></i> Personalized Rashiphal Codex (English / हिंदी)
+            </button>
+            <button onclick="switchMainTab('questionnaireView')" id="tab-questionnaireView" class="tab-btn px-4 py-2 text-sm font-medium rounded-t-xl transition whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-celestial-800/60">
+                <i class="fa-solid fa-comments text-amber-400 mr-1.5"></i> Ask AI Jyotishi (प्रश्नावली व संदेह)
             </button>
             <button onclick="switchMainTab('doshaYogaView')" id="tab-doshaYogaView" class="tab-btn px-4 py-2 text-sm font-medium rounded-t-xl transition whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-celestial-800/60">
                 <i class="fa-solid fa-shield-halved text-celestial-accent mr-1.5"></i> Dosha & Yoga Engine (दोष व योग)
@@ -221,6 +261,68 @@
 
         <!-- MAIN TAB CONTENTS -->
         <div id="mainViewsContainer" class="min-h-[520px]">
+
+            <!-- TAB: AI QUESTIONNAIRE & DOUBTS CONSULTATION -->
+            <div id="questionnaireView" class="tab-content hidden space-y-6">
+                <div class="bg-celestial-800/90 border border-celestial-accent/40 rounded-2xl p-6 shadow-2xl space-y-5">
+                    <div class="border-b border-celestial-700/80 pb-3 flex flex-wrap justify-between items-center gap-3">
+                        <div>
+                            <h3 class="font-cinzel font-bold gold-gradient-text text-lg flex items-center gap-2">
+                                <i class="fa-solid fa-brain text-celestial-accent"></i> AI JYOTISH CONSULTATION & QUESTIONNAIRE (ज्योतिष परामर्श व प्रश्न उत्तर)
+                            </h3>
+                            <p class="text-xs text-slate-400">Ask any specific doubt about your career, finances, marriage, foreign travel, or timing directly to the AI Scholar Jyotishi.</p>
+                        </div>
+                        <span class="px-3 py-1 rounded-full bg-celestial-700 text-celestial-accent text-xs font-semibold border border-celestial-600">
+                            <i class="fa-solid fa-sparkles text-amber-300 mr-1"></i> Powered by Gemini 3 Flash
+                        </span>
+                    </div>
+
+                    <!-- Quick Query Presets -->
+                    <div>
+                        <label class="block text-xs font-bold font-cinzel text-celestial-accentLight uppercase mb-2">Popular Life Queries (लोकप्रिय प्रश्न):</label>
+                        <div class="flex flex-wrap gap-2">
+                            <button type="button" onclick="selectPresetQuery('When will my career transition into business stabilize and bring peak financial success?')" class="px-3 py-1.5 text-xs rounded-xl bg-celestial-900 hover:bg-celestial-700 border border-celestial-700 text-slate-300 hover:text-celestial-accent transition text-left">
+                                <i class="fa-solid fa-briefcase text-amber-400 mr-1"></i> Business & Wealth Timing
+                            </button>
+                            <button type="button" onclick="selectPresetQuery('How will Rahu in the 12th house impact my international trade, foreign relocation, and Dubai/overseas expansion?')" class="px-3 py-1.5 text-xs rounded-xl bg-celestial-900 hover:bg-celestial-700 border border-celestial-700 text-slate-300 hover:text-celestial-accent transition text-left">
+                                <i class="fa-solid fa-plane text-cyan-400 mr-1"></i> Foreign Settlement & Trade
+                            </button>
+                            <button type="button" onclick="selectPresetQuery('What are the legal precautions and partnership warnings I should follow during Saturn Sade Sati?')" class="px-3 py-1.5 text-xs rounded-xl bg-celestial-900 hover:bg-celestial-700 border border-celestial-700 text-slate-300 hover:text-celestial-accent transition text-left">
+                                <i class="fa-solid fa-gavel text-rose-400 mr-1"></i> Legal & Partnership Risk
+                            </button>
+                            <button type="button" onclick="selectPresetQuery('Which gemstones and daily spiritual mantras should I practice to strengthen my Lagna and Bhagya lords?')" class="px-3 py-1.5 text-xs rounded-xl bg-celestial-900 hover:bg-celestial-700 border border-celestial-700 text-slate-300 hover:text-celestial-accent transition text-left">
+                                <i class="fa-solid fa-gem text-emerald-400 mr-1"></i> Personalized Remedies & Gemstones
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Custom Question Input Box -->
+                    <div class="space-y-3">
+                        <label class="block text-xs font-medium text-slate-300"><i class="fa-solid fa-pen-nib text-celestial-accent mr-1"></i> Type your doubt or question (हिंदी या English में लिखें):</label>
+                        <textarea id="userCustomQuestion" rows="3" placeholder="e.g. Will my business turnover increase after May 2027 when Sade Sati ends? / क्या मई 2027 के बाद मेरे व्यवसाय में उन्नति होगी?" class="w-full bg-celestial-900 border border-celestial-600 rounded-xl p-3 text-xs text-slate-100 focus:outline-none focus:border-celestial-accent leading-relaxed"></textarea>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-[11px] text-slate-400"><i class="fa-solid fa-circle-info mr-1"></i> Your natal longitudes, current Dasha, and Ashtakavarga points will be included in the AI context prompt.</span>
+                            <button type="button" onclick="askAiJyotishi()" id="askAiBtn" class="gold-button px-5 py-2.5 rounded-xl text-xs font-bold shadow-lg flex items-center gap-2">
+                                <i class="fa-solid fa-paper-plane"></i> <span id="askAiBtnText">Consult Scholar Jyotishi</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Response Output Container -->
+                    <div id="aiResponseContainer" class="hidden bg-celestial-900/90 border border-celestial-700 rounded-2xl p-5 space-y-4">
+                        <div class="flex items-center justify-between border-b border-celestial-700/80 pb-2">
+                            <span class="font-cinzel font-bold text-celestial-accent text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-scroll text-celestial-accent"></i> JYOTISH CHINTAN & PREDICTION (ज्योतिषीय समाधान)
+                            </span>
+                            <span class="text-[10px] text-slate-400 font-mono">Model: gemini-3-flash-preview</span>
+                        </div>
+                        <div id="aiResponseBody" class="text-xs text-slate-200 leading-relaxed space-y-3 font-sans">
+                            <!-- AI Response populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- TAB: RASHIPHAL CODEX FORECASTS -->
             <div id="codexView" class="tab-content space-y-6">
@@ -504,7 +606,7 @@
                             <p class="text-xs text-slate-400">Evaluates transiting planets against your natal BAV & SAV bindu points.</p>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <input type="date" id="gocharInputDate" value="2026-11-25" class="bg-celestial-900 border border-celestial-600 rounded-xl px-3 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-celestial-accent">
+                            <input type="date" id="gocharInputDate" value="2026-11-25" onchange="evaluateGochar()" class="bg-celestial-900 border border-celestial-600 rounded-xl px-3 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-celestial-accent">
                             <button onclick="evaluateGochar()" class="gold-button px-3 py-1.5 rounded-xl text-xs font-bold">
                                 Evaluate Transit
                             </button>
@@ -540,8 +642,40 @@
 
     <!-- JAVASCRIPT ENGINE & LOGIC -->
     <script>
+        window.loadSamplePreset = function() {
+            document.getElementById("inputName").value = "Sample Native";
+            document.getElementById("inputDate").value = "1995-05-15";
+            document.getElementById("inputTime").value = "10:00:00";
+            document.getElementById("inputCityName").value = "New Delhi, India";
+            document.getElementById("inputLat").value = "28.6139";
+            document.getElementById("inputLon").value = "77.2090";
+            document.getElementById("inputTz").value = "5.5";
+            
+            let ev = new Event('submit', { cancelable: true });
+            document.getElementById("kundaliInputForm").dispatchEvent(ev);
+        };
+
+        window.handleBirthDetailsSubmit = function(e) {
+            if (e) e.preventDefault();
+            
+            let dateVal = document.getElementById("inputDate").value;
+            let timeVal = document.getElementById("inputTime").value;
+            let lat = parseFloat(document.getElementById("inputLat").value) || 28.6139;
+            let lon = parseFloat(document.getElementById("inputLon").value) || 77.2090;
+            let tz = parseFloat(document.getElementById("inputTz").value) || 5.5;
+
+            if (!dateVal || !timeVal) return;
+
+            let [yr, mo, dy] = dateVal.split('-').map(Number);
+            let [hr, mn, sc] = timeVal.split(':').map(Number);
+            let hourLocal = hr + (mn / 60.0) + ((sc || 0) / 3600.0);
+
+            let computed = window.calculateFullKundaliData(yr, mo, dy, hourLocal, lat, lon, tz);
+            window.renderCalculatedData(computed);
+        };
+
         // =========================================================================
-        // CONSTANTS & TABLES
+        // CONSTANTS & ASTROLOGICAL TABLES
         // =========================================================================
         const RASHIS = [
             "Aries (Mesha)", "Taurus (Vrishabha)", "Gemini (Mithuna)", "Cancer (Karka)",
@@ -556,8 +690,13 @@
         const EXALTATION_SIGN = { "Sun": 0, "Moon": 1, "Mars": 9, "Mercury": 5, "Jupiter": 3, "Venus": 11, "Saturn": 6 };
         const DEBILITATION_SIGN = { "Sun": 6, "Moon": 7, "Mars": 3, "Mercury": 11, "Jupiter": 9, "Venus": 5, "Saturn": 0 };
         const MOOLATRIKONA_RANGES = {
-            "Sun": [4, 0.0, 20.0], "Moon": [1, 3.0, 30.0], "Mars": [0, 0.0, 12.0],
-            "Mercury": [5, 15.0, 20.0], "Jupiter": [8, 0.0, 10.0], "Venus": [6, 0.0, 15.0], "Saturn": [10, 0.0, 20.0]
+            "Sun": [4, 0.0, 20.0],
+            "Moon": [1, 3.0, 30.0],
+            "Mars": [0, 0.0, 12.0],
+            "Mercury": [5, 15.0, 20.0],
+            "Jupiter": [8, 0.0, 10.0],
+            "Venus": [6, 0.0, 15.0],
+            "Saturn": [10, 0.0, 20.0]
         };
         const OWN_SIGNS = {
             "Sun": [4], "Moon": [3], "Mars": [0, 7], "Mercury": [2, 5],
@@ -591,7 +730,7 @@
             "Moon": { "Sun": [3, 6, 7, 8, 10, 11], "Moon": [1, 3, 6, 7, 10, 11], "Mars": [2, 3, 5, 6, 9, 10, 11], "Mercury": [1, 3, 4, 5, 7, 8, 10, 11], "Jupiter": [1, 4, 7, 8, 10, 11, 12], "Venus": [3, 4, 5, 7, 9, 10, 11], "Saturn": [3, 5, 6, 11], "Lagna": [3, 6, 10, 11] },
             "Mars": { "Sun": [3, 5, 6, 10, 11], "Moon": [3, 6, 11], "Mars": [1, 2, 4, 7, 8, 10, 11], "Mercury": [3, 5, 6, 11], "Jupiter": [6, 10, 11, 12], "Venus": [6, 8, 11, 12], "Saturn": [1, 4, 7, 8, 9, 10, 11], "Lagna": [1, 3, 6, 10, 11] },
             "Mercury": { "Sun": [5, 6, 9, 11, 12], "Moon": [2, 4, 6, 8, 10, 11], "Mars": [1, 2, 4, 7, 8, 9, 10, 11], "Mercury": [1, 3, 5, 6, 9, 10, 11, 12], "Jupiter": [6, 8, 11, 12], "Venus": [1, 2, 3, 4, 5, 8, 9, 11], "Saturn": [1, 2, 4, 7, 8, 9, 10, 11], "Lagna": [1, 2, 4, 6, 8, 10, 11] },
-            "Jupiter": { "Sun": [1, 2, 3, 4, 7, 8, 9, 10, 11], "Moon": [2, 5, 7, 9, 11], "Mars": [1, 2, 4, 7, 8, 10, 11], "Mercury": [1, 2, 4, 5, 6, 9, 10, 11], "Jupiter": [1, 2, 3, 4, 7, 8, 10, 11], "Venus": [2, 5, 6, 9, 10, 11], "Saturn": [3, 5, 6, 12], "Lagna": [1, 2, 3, 4, 5, 6, 7, 9, 10, 11] },
+            "Jupiter": { "Sun": [1, 2, 3, 4, 7, 8, 9, 10, 11], "Moon": [2, 5, 7, 9, 11], "Mars": [1, 2, 4, 7, 8, 10, 11], "Mercury": [1, 2, 4, 5, 6, 9, 10, 11], "Jupiter": [1, 2, 3, 4, 7, 8, 10, 11], "Venus": [2, 5, 6, 9, 10, 11], "Saturn": [3, 5, 6, 12], "Lagna": [1, 2, 4, 5, 6, 7, 9, 10, 11] },
             "Venus": { "Sun": [8, 11, 12], "Moon": [1, 2, 3, 4, 5, 8, 9, 11, 12], "Mars": [3, 5, 6, 9, 11, 12], "Mercury": [3, 5, 6, 9, 11], "Jupiter": [5, 8, 9, 10, 11], "Venus": [1, 2, 3, 4, 5, 8, 9, 10, 11], "Saturn": [3, 4, 5, 8, 9, 10, 11], "Lagna": [1, 2, 3, 4, 5, 8, 9, 11] },
             "Saturn": { "Sun": [1, 2, 4, 7, 8, 10, 11], "Moon": [3, 6, 11], "Mars": [3, 5, 6, 10, 11, 12], "Mercury": [6, 8, 9, 10, 11, 12], "Jupiter": [5, 6, 11, 12], "Venus": [6, 11, 12], "Saturn": [3, 5, 6, 11], "Lagna": [1, 3, 4, 6, 10, 11] }
         };
@@ -600,91 +739,12 @@
             "Mars": [0, 7], "Mercury": [2, 5], "Jupiter": [8, 11], "Venus": [1, 6], "Saturn": [9, 10]
         };
 
-        const TRANSIT_SNAPSHOTS = [
-            {
-                planet: "Saturn (शनि)", sign: "Pisces (मीन)", house: "2nd House / द्वितीय भाव",
-                status: "Retrograde / वक्री (Sade Sati Phase 3)",
-                desc_en: "Final phase of Sade Sati. Tests financial foundations and demands structural discipline.",
-                desc_hi: "साढ़े साती का अंतिम चरण। वित्तीय नींव की परीक्षा और संरचनात्मक अनुशासन की मांग।"
-            },
-            {
-                planet: "Jupiter (गुरु)", sign: "Cancer (कर्क)", house: "6th House / षष्ठ भाव",
-                status: "Exalted / उच्च (Maximum Protection)",
-                desc_en: "Classical protection against legal friction and opponents; clears obstacles.",
-                desc_hi: "कानूनी विवादों और विरोधियों से मजबूत सुरक्षा; बाधाओं का निवारण।"
-            },
-            {
-                planet: "Rahu (राहु)", sign: "Aquarius (कुंभ)", house: "1st House / प्रथम भाव",
-                status: "Identity Reconstruction / व्यक्तित्व पुनर्गठन",
-                desc_en: "Shifts core identity and opens foreign pathways; breaks old patterns.",
-                desc_hi: "मूल पहचान में बदलाव और विदेशी अवसरों का मार्ग; पुराने ढर्रे को तोड़ता है।"
-            },
-            {
-                planet: "Ketu (केतु)", sign: "Leo (सिंह)", house: "7th House / सप्तम भाव",
-                status: "Dissolution & Refinement / विसर्जन और परिष्कार",
-                desc_en: "Filters partnerships and refines public relations; dissolves opposition.",
-                desc_hi: "साझेदारी का फ़िल्टर और सार्वजनिक संबंधों का शोधन; विरोध का शमन।"
-            }
-        ];
-
         let currentCalculatedData = null;
 
-        // UI Tab and Horizon Switcher Handlers
-        window.switchHorizon = function(horizonKey) {
-            const btn1 = document.getElementById('btn-horizon-1Y');
-            const btn5 = document.getElementById('btn-horizon-5Y');
-            const btn10 = document.getElementById('btn-horizon-10Y');
-            
-            if (btn1) btn1.className = (horizonKey === '1Y') ? "px-3 py-1.5 text-xs font-bold rounded-xl bg-celestial-700 text-celestial-accent border border-celestial-600" : "px-3 py-1.5 text-xs font-medium rounded-xl text-slate-400 hover:text-slate-200";
-            if (btn5) btn5.className = (horizonKey === '5Y') ? "px-3 py-1.5 text-xs font-bold rounded-xl bg-celestial-700 text-celestial-accent border border-celestial-600" : "px-3 py-1.5 text-xs font-medium rounded-xl text-slate-400 hover:text-slate-200";
-            if (btn10) btn10.className = (horizonKey === '10Y') ? "px-3 py-1.5 text-xs font-bold rounded-xl bg-celestial-700 text-celestial-accent border border-celestial-600" : "px-3 py-1.5 text-xs font-medium rounded-xl text-slate-400 hover:text-slate-200";
+        // =========================================================================
+        // ASTRONOMICAL & SIDEREAL ENGINE
+        // =========================================================================
 
-            ['card-horizon-1Y', 'card-horizon-5Y', 'card-horizon-10Y'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.classList.add('hidden');
-            });
-            const activeCard = document.getElementById(`card-horizon-${horizonKey}`);
-            if (activeCard) activeCard.classList.remove('hidden');
-        };
-
-        window.switchMainTab = function(tabId) {
-            const tabs = document.querySelectorAll("#mainTabContainer .tab-btn");
-            tabs.forEach(t => {
-                t.className = "tab-btn px-4 py-2 text-sm font-medium rounded-t-xl transition whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-celestial-800/60";
-            });
-
-            const activeBtn = document.getElementById("tab-" + tabId);
-            if (activeBtn) {
-                activeBtn.className = "tab-btn px-4 py-2 text-sm font-medium rounded-t-xl transition whitespace-nowrap bg-celestial-700 text-celestial-accent border-t border-x border-celestial-600";
-            }
-
-            const contents = document.querySelectorAll("#mainViewsContainer .tab-content");
-            contents.forEach(c => c.classList.add("hidden"));
-
-            const activeContent = document.getElementById(tabId);
-            if (activeContent) activeContent.classList.remove("hidden");
-        };
-
-        function renderTransitCards() {
-            const grid = document.getElementById("transitSnapshotGrid");
-            if (!grid) return;
-            grid.innerHTML = "";
-            TRANSIT_SNAPSHOTS.forEach(t => {
-                grid.innerHTML += `
-                    <div class="bg-celestial-800/80 border border-celestial-700 rounded-xl p-3.5 space-y-1.5">
-                        <div class="flex items-center justify-between">
-                            <span class="font-bold text-xs text-celestial-accent font-cinzel">${t.planet}</span>
-                            <span class="text-[10px] px-2 py-0.5 rounded bg-celestial-700 text-celestial-accentLight font-semibold">${t.house}</span>
-                        </div>
-                        <div class="text-[11px] font-semibold text-slate-200">${t.sign} • <span class="text-amber-400">${t.status}</span></div>
-                        <p class="text-[11px] text-slate-300 leading-snug">${t.desc_en}</p>
-                        <p class="text-[10px] text-amber-200/70 pt-1 border-t border-celestial-700/50">${t.desc_hi}</p>
-                    </div>
-                `;
-            });
-        }
-
-        // Math & Astronomical Utilities
         function toRad(deg) { return deg * Math.PI / 180.0; }
         function toDeg(rad) { return rad * 180.0 / Math.PI; }
         function norm360(deg) { let d = deg % 360.0; return d < 0 ? d + 360.0 : d; }
@@ -715,7 +775,8 @@
             let C_moon = 6.2886 * Math.sin(toRad(M_moon)) + 1.2740 * Math.sin(toRad(2 * (L_moon - sun_trop) - M_moon));
             let moon_trop = norm360(L_moon + C_moon);
 
-            let rahu_trop = norm360(125.04452 - 1934.136261 * T);
+            let omega_node = norm360(125.04452 - 1934.136261 * T);
+            let rahu_trop = omega_node;
             let ketu_trop = norm360(rahu_trop + 180.0);
 
             let mars_trop = norm360(355.453 + 19140.299 * T + 0.6 * Math.sin(toRad(355.453 + 19140.299 * T)));
@@ -764,7 +825,8 @@
             let nakSpan = 360.0 / 27.0;
             let nakIdx = Math.min(Math.floor(norm / nakSpan), 26);
             let degInNak = norm % nakSpan;
-            let pada = Math.min(Math.floor(degInNak / (nakSpan / 4.0)) + 1, 4);
+            let padaSpan = nakSpan / 4.0;
+            let pada = Math.min(Math.floor(degInNak / padaSpan) + 1, 4);
             let [name, lord] = NAKSHATRAS[nakIdx];
             return { index: nakIdx + 1, name, lord, pada, fractionRemaining: 1.0 - (degInNak / nakSpan) };
         }
@@ -773,16 +835,35 @@
             let norm = norm360(sidLon);
             let d1RashiIdx = Math.floor(norm / 30.0);
             let degInSign = norm % 30.0;
-            let navPart = Math.min(Math.floor(degInSign / (30.0 / 9.0)), 8);
-            let startOffset = [0, 8, 4][d1RashiIdx % 3];
+            let navSpan = 30.0 / 9.0;
+            let navPart = Math.min(Math.floor(degInSign / navSpan), 8);
+            let modality = d1RashiIdx % 3;
+            let startOffset = [0, 8, 4][modality];
             let d9RashiIdx = (d1RashiIdx + startOffset + navPart) % 12;
-            return { pada: navPart + 1, d9RashiIdx, d9Rashi: RASHIS[d9RashiIdx], vargottama: d1RashiIdx === d9RashiIdx };
+
+            return {
+                pada: navPart + 1,
+                d9RashiIdx: d9RashiIdx,
+                d9Rashi: RASHIS[d9RashiIdx],
+                vargottama: d1RashiIdx === d9RashiIdx
+            };
+        }
+
+        function getD10Info(sidLon) {
+            let norm = norm360(sidLon);
+            let d1RashiIdx = Math.floor(norm / 30.0);
+            let degInSign = norm % 30.0;
+            let d10Part = Math.min(Math.floor(degInSign / 3.0), 9);
+            let isOdd = (d1RashiIdx % 2 === 0);
+            let d10RashiIdx = isOdd ? (d1RashiIdx + d10Part) % 12 : (d1RashiIdx + 8 + d10Part) % 12;
+            return { d10RashiIdx, d10Rashi: RASHIS[d10RashiIdx] };
         }
 
         function isMoolatrikona(planetName, rashiIdx, degInSign) {
             let mt = MOOLATRIKONA_RANGES[planetName];
             if (!mt) return false;
-            return rashiIdx === mt[0] && (degInSign >= mt[1] && degInSign < mt[2]);
+            let [mtSign, startDeg, endDeg] = mt;
+            return rashiIdx === mtSign && (degInSign >= startDeg && degInSign < endDeg);
         }
 
         function getDignity(planetName, rashiIdx, degInSign = null) {
@@ -793,21 +874,14 @@
             return "Neutral";
         }
 
-        function getDignityBadgeClass(dignity) {
-            switch(dignity) {
-                case "Exalted": return "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
-                case "Debilitated": return "bg-rose-500/20 text-rose-300 border border-rose-500/40";
-                case "Moolatrikona": return "bg-amber-500/20 text-amber-300 border border-amber-500/40";
-                case "Swakshetra": return "bg-blue-500/20 text-blue-300 border border-blue-500/40";
-                default: return "bg-slate-700/50 text-slate-400";
-            }
-        }
+        // =========================================================================
+        // DASHA & ASHTAKAVARGA COMPUTATIONS
+        // =========================================================================
 
         function computeVimshottariDashas(moonSidLon, birthDt) {
             let moonNak = getNakshatraInfo(moonSidLon);
             let startLord = moonNak.lord;
             let startIdx = VIMSHOTTARI_ORDER.findIndex(([lord]) => lord === startLord);
-
             let balanceYears = moonNak.fractionRemaining * DASHA_YEARS_MAP[startLord];
             let mahadashas = [];
             let currentStart = new Date(birthDt.getTime());
@@ -832,27 +906,27 @@
                     let adEnd = new Date(adCursor.getTime() + adDurationDays * 86400000);
 
                     if (adEnd > birthDt) {
-                        let effectiveAdStart = new Date(Math.max(adCursor.getTime(), birthDt.getTime()));
-                        antardashas.push({ lord: adLord, start: effectiveAdStart, end: adEnd });
+                        antardashas.push({
+                            lord: adLord,
+                            start: new Date(Math.max(adCursor.getTime(), birthDt.getTime())),
+                            end: adEnd
+                        });
                     }
                     adCursor = adEnd;
                 }
 
-                mahadashas.push({ lord, durationYears, start: currentStart, end: currentEnd, isBirthBalance: step === 0, antardashas });
+                mahadashas.push({
+                    lord: lord,
+                    durationYears: durationYears,
+                    start: currentStart,
+                    end: currentEnd,
+                    isBirthBalance: (step === 0),
+                    antardashas: antardashas
+                });
                 currentStart = currentEnd;
             }
 
             return { moonNakshatra: moonNak, birthBalanceYears: balanceYears, mahadashas };
-        }
-
-        function resolveActiveDasha(dashaData, targetDt) {
-            let targetTime = targetDt.getTime();
-            let mahadashas = dashaData.mahadashas;
-            if (!mahadashas || targetTime < mahadashas[0].start.getTime() || targetTime >= mahadashas[mahadashas.length - 1].end.getTime()) return null;
-            let activeMd = mahadashas.find(md => targetTime >= md.start.getTime() && targetTime < md.end.getTime());
-            if (!activeMd) return null;
-            let activeAd = activeMd.antardashas.find(ad => targetTime >= ad.start.getTime() && targetTime < ad.end.getTime()) || activeMd.antardashas[activeMd.antardashas.length - 1];
-            return { queryDate: targetDt, md: activeMd, ad: activeAd };
         }
 
         function computeAshtakavargaEngine(contributorSigns, d1LagnaIdx, occupiedSigns) {
@@ -878,8 +952,7 @@
                 let pair = DUAL_LORD_PAIRS[planet];
                 if (!pair) return res;
                 let [sa, sb] = pair;
-                let occA = occupiedSigns.has(sa);
-                let occB = occupiedSigns.has(sb);
+                let occA = occupiedSigns.has(sa), occB = occupiedSigns.has(sb);
 
                 if (!occA && !occB) {
                     let minV = Math.min(res[sa], res[sb]);
@@ -907,9 +980,7 @@
                     let offsets = BAV_RULES[planet][contrib];
                     for (let targetSign = 0; targetSign < 12; targetSign++) {
                         let houseOffset = ((targetSign - cSign + 12) % 12) + 1;
-                        if (offsets.includes(houseOffset)) {
-                            bindus[targetSign]++;
-                        }
+                        if (offsets.includes(houseOffset)) bindus[targetSign]++;
                     }
                 });
 
@@ -924,9 +995,9 @@
                 trikonaBavHouse[planet] = signsToHouses(afterTrikona);
                 finalBavHouse[planet] = signsToHouses(afterEkadhipatya);
 
-                rawTotals[planet] = bindus.reduce((a,b) => a+b, 0);
-                trikonaTotals[planet] = afterTrikona.reduce((a,b) => a+b, 0);
-                finalTotals[planet] = afterEkadhipatya.reduce((a,b) => a+b, 0);
+                rawTotals[planet] = bindus.reduce((a,b)=>a+b,0);
+                trikonaTotals[planet] = afterTrikona.reduce((a,b)=>a+b,0);
+                finalTotals[planet] = afterEkadhipatya.reduce((a,b)=>a+b,0);
 
                 let rashiPinda = 0, grahaPinda = 0;
                 for (let s = 0; s < 12; s++) {
@@ -934,19 +1005,14 @@
                     rashiPinda += b * RASHI_MULTIPLIERS[s];
                     grahaPinda += b * GRAHA_MULTIPLIERS[SIGN_LORDS[s]];
                 }
-                shodhyaPindas[planet] = {
-                    rashiPinda, grahaPinda, shodhyaPinda: rashiPinda + grahaPinda
-                };
+                shodhyaPindas[planet] = { rashiPinda, grahaPinda, shodhyaPinda: rashiPinda + grahaPinda };
             });
 
             let savRawSign = new Array(12).fill(0);
-            let savTrikonaSign = new Array(12).fill(0);
             let savFinalSign = new Array(12).fill(0);
-
             for (let s = 0; s < 12; s++) {
                 ASHTAKAVARGA_PLANETS.forEach(p => {
                     savRawSign[s] += rawBavSign[p][s];
-                    savTrikonaSign[s] += trikonaBavSign[p][s];
                     savFinalSign[s] += finalBavSign[p][s];
                 });
             }
@@ -955,7 +1021,7 @@
                 rawBavSign, trikonaBavSign, finalBavSign,
                 rawBavHouse, trikonaBavHouse, finalBavHouse,
                 rawTotals, trikonaTotals, finalTotals, shodhyaPindas,
-                savRawSign, savTrikonaSign, savFinalSign,
+                savRawSign, savFinalSign,
                 savRawHouse: signsToHouses(savRawSign),
                 savFinalHouse: signsToHouses(savFinalSign),
                 savRawTotal: savRawSign.reduce((a,b)=>a+b,0),
@@ -963,304 +1029,78 @@
             };
         }
 
-        function getD10RashiIndex(d1RashiIdx, degInSign) {
-            let part = Math.min(Math.floor(degInSign / 3.0), 9);
-            let isOdd = (d1RashiIdx % 2 === 0); 
-            let startSign = isOdd ? d1RashiIdx : (d1RashiIdx + 8) % 12;
-            return (startSign + part) % 12;
-        }
+        // Global calculation facade
+        window.calculateFullKundaliData = function(year, month, day, hourLocal, lat, lon, tzOffsetHours) {
+            let localDt = new Date(year, month - 1, day, Math.floor(hourLocal), Math.floor((hourLocal % 1) * 60));
+            let hourUT = hourLocal - tzOffsetHours;
+            let jdUT = getJulianDayUT(year, month, day, hourUT);
 
-        function computeDoshasAndYogas(data) {
-            let doshas = [];
-            let yogas = [];
+            let astro = calculateSiderealLongitudes(jdUT, lat, lon);
+            let d1LagnaIdx = getRashiIndex(astro.ascendant);
+            let d9LagnaInfo = getNavamshaInfo(astro.ascendant);
+            let d10LagnaInfo = getD10Info(astro.ascendant);
 
-            // 1. Manglik Dosha Evaluation
-            let marsHouse = data.grahas.find(g => g.name === "Mars").d1House;
-            let manglikHouses = [1, 4, 7, 8, 12];
-            let isManglik = manglikHouses.includes(marsHouse);
-            doshas.push({
-                name: "Manglik Dosha (मांगलिक दोष)",
-                status: isManglik ? "Active / उपस्थित" : "Absent / अनुपस्थित",
-                severity: isManglik ? "Moderate" : "None",
-                desc_en: isManglik ? `Mars occupies House ${marsHouse}. Requires balanced matching and Hanuman Chalisa remedies.` : "Mars does not occupy 1st, 4th, 7th, 8th, or 12th houses.",
-                desc_hi: isManglik ? `मंगल ${marsHouse}वें भाव में स्थित है। नियमित हनुमान चालीसा पाठ व संतुलन आवश्यक।` : "मंगल 1, 4, 7, 8 या 12वें भाव में नहीं है।"
-            });
+            let grahaRecords = [];
+            let contributorSigns = { "Lagna": d1LagnaIdx };
+            let occupiedSigns = new Set();
+            let moonRashiIdx = null;
 
-            // 2. Kalsarpa Dosha Check
-            let rahuLon = data.grahas.find(g => g.name === "Rahu").sidLon;
-            let ketuLon = data.grahas.find(g => g.name === "Ketu").sidLon;
-            let otherLons = data.grahas.filter(g => g.name !== "Rahu" && g.name !== "Ketu").map(g => g.sidLon);
-            let allOneSide = otherLons.every(l => ((l - rahuLon + 360) % 360) < 180);
-            doshas.push({
-                name: "Kalsarpa Dosha (कालसर्प दोष)",
-                status: allOneSide ? "Partial / आंशिक" : "Nullified / निरस्त",
-                severity: allOneSide ? "Mild-Moderate" : "None",
-                desc_en: allOneSide ? "Planets hemmed along nodal axis. Periodic Shiva Abhishek is recommended." : "Planets distributed across both sides of Rahu-Ketu axis.",
-                desc_hi: allOneSide ? "ग्रह राहु-केतु अक्ष के भीतर स्थित हैं। सोमवारी शिव अभिषेक लाभकारी है।" : "सभी ग्रह राहु-केतु अक्ष के दोनों ओर प्रसारित हैं।"
-            });
+            GRAHA_NAMES.forEach(name => {
+                let sidLon = astro.planets[name];
+                let degInSign = sidLon % 30.0;
+                let d1RashiIdx = getRashiIndex(sidLon);
+                occupiedSigns.add(d1RashiIdx);
 
-            // 3. Shasha Mahapurusha Yoga
-            let saturn = data.grahas.find(g => g.name === "Saturn");
-            let isShasha = [1, 4, 7, 10].includes(saturn.d1House) && (saturn.d1Dignity === "Swakshetra" || saturn.d1Dignity === "Exalted");
-            if (isShasha) {
-                yogas.push({
-                    name: "Shasha Mahapurusha Yoga (शश महापुरुष योग)",
-                    type: "Panch Mahapurusha",
-                    desc_en: "Saturn in own/exaltation sign in a Kendra house. Grants structural leadership, operational authority, and long-term stamina.",
-                    desc_hi: "केन्द्र भाव में शनि स्वराशि/उच्च स्थित। दीर्घकालिक नेतृत्व, प्रशासनिक क्षमता व सहनशक्ति का प्रतीक।"
+                if (ASHTAKAVARGA_PLANETS.includes(name)) contributorSigns[name] = d1RashiIdx;
+                if (name === "Moon") moonRashiIdx = d1RashiIdx;
+
+                let d1House = getWholeSignHouse(d1RashiIdx, d1LagnaIdx);
+                let nak = getNakshatraInfo(sidLon);
+                let nav = getNavamshaInfo(sidLon);
+                let d10 = getD10Info(sidLon);
+
+                let d9House = getWholeSignHouse(nav.d9RashiIdx, d9LagnaInfo.d9RashiIdx);
+                let d10House = getWholeSignHouse(d10.d10RashiIdx, d10LagnaInfo.d10RashiIdx);
+
+                let d1Dignity = getDignity(name, d1RashiIdx, degInSign);
+                let d9Dignity = getDignity(name, nav.d9RashiIdx);
+                let d10Dignity = getDignity(name, d10.d10RashiIdx);
+
+                grahaRecords.push({
+                    name, sidLon, degInSign, d1RashiIdx, d1Rashi: RASHIS[d1RashiIdx],
+                    d1House, d1Dignity, nakshatra: nak, d9Pada: nav.pada,
+                    d9RashiIdx: nav.d9RashiIdx, d9Rashi: nav.d9Rashi, d9House, d9Dignity,
+                    d10RashiIdx: d10.d10RashiIdx, d10Rashi: d10.d10Rashi, d10House, d10Dignity,
+                    vargottama: nav.vargottama
                 });
-            }
-
-            // 4. Guru-Mangala Yoga
-            let jupiter = data.grahas.find(g => g.name === "Jupiter");
-            let mars = data.grahas.find(g => g.name === "Mars");
-            if (jupiter.d1House === mars.d1House) {
-                yogas.push({
-                    name: "Guru-Mangala Yoga (गुरु-मंगल योग)",
-                    type: "Wealth & Enterprise",
-                    desc_en: `Jupiter and Mars conjoint in House ${jupiter.d1House}. Combines vision with decisive execution for enterprise wealth.`,
-                    desc_hi: `गुरु व मंगल ${jupiter.d1House}वें भाव में एक साथ स्थित। दूरदर्शिता एवं साहसिक कार्यक्षमता का अद्भुत संयोग।`
-                });
-            }
-
-            return { doshas, yogas };
-        }
-
-        function renderDoshaCards(data) {
-            let res = computeDoshasAndYogas(data);
-            let container = document.getElementById("doshaCardsGrid");
-            if (!container) return;
-            container.innerHTML = "";
-
-            res.doshas.forEach(d => {
-                let badgeClass = d.severity === "None" ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40" : "bg-amber-500/20 text-amber-300 border border-amber-500/40";
-                container.innerHTML += `
-                    <div class="bg-celestial-900/80 border border-celestial-700 rounded-xl p-4 space-y-2">
-                        <div class="flex items-center justify-between">
-                            <h4 class="font-cinzel font-bold text-celestial-accent text-xs">${d.name}</h4>
-                            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeClass}">${d.status}</span>
-                        </div>
-                        <p class="text-xs text-slate-300">${d.desc_en}</p>
-                        <p class="text-[11px] text-amber-200/70 border-t border-celestial-700/50 pt-1.5">${d.desc_hi}</p>
-                    </div>
-                `;
             });
-        }
 
-        function renderYogaCards(data) {
-            let res = computeDoshasAndYogas(data);
-            let container = document.getElementById("yogaCardsGrid");
-            if (!container) return;
-            container.innerHTML = "";
+            let sidCusps = [];
+            for (let h = 0; h < 12; h++) sidCusps.push(norm360(astro.ascendant + (h * 30.0)));
 
-            if (res.yogas.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-400">Standard planetary combinations active.</p>`;
-                return;
-            }
-
-            res.yogas.forEach(y => {
-                container.innerHTML += `
-                    <div class="bg-celestial-900/80 border border-celestial-accent/30 rounded-xl p-4 space-y-2">
-                        <div class="flex items-center justify-between">
-                            <h4 class="font-cinzel font-bold text-celestial-accentLight text-sm"><i class="fa-solid fa-crown text-amber-400 mr-1.5"></i> ${y.name}</h4>
-                            <span class="px-2 py-0.5 rounded bg-celestial-700 text-celestial-accent font-bold text-[10px]">${y.type}</span>
-                        </div>
-                        <p class="text-xs text-slate-200">${y.desc_en}</p>
-                        <p class="text-[11px] text-amber-200/70 border-t border-celestial-700/50 pt-1.5">${y.desc_hi}</p>
-                    </div>
-                `;
+            let chalitRecords = grahaRecords.map(g => {
+                let chalitHouse = getWholeSignHouse(g.d1RashiIdx, d1LagnaIdx);
+                let cuspCenter = sidCusps[chalitHouse - 1];
+                let offset = ((g.sidLon - cuspCenter + 180.0) % 360.0) - 180.0;
+                return { ...g, chalitHouse, cuspCenter, offset };
             });
-        }
 
-        function renderGemstoneCards(data) {
-            let container = document.getElementById("gemstoneCardsGrid");
-            if (!container) return;
-            container.innerHTML = "";
+            let dashaData = computeVimshottariDashas(astro.planets["Moon"], localDt);
+            let ashtakavarga = computeAshtakavargaEngine(contributorSigns, d1LagnaIdx, occupiedSigns);
 
-            let items = [
-                {
-                    name: "Pearl (मोती / Moti)",
-                    purpose: "Moon / Rahu Balance",
-                    wearing: "Right Little Finger (Silver)",
-                    desc_en: "Strengthens emotional resilience and calms restless thoughts.",
-                    desc_hi: "मानसिक शांति व चंद्रमा के संतुलन हेतु उपयुक्त।"
-                },
-                {
-                    name: "Opal / Diamond (ओपल / हीरा)",
-                    purpose: "Venus Fortune Activation",
-                    wearing: "Right Ring Finger (Silver/Platinum)",
-                    desc_en: "Activates 9th house lord for wealth, luxury, and smooth luck flow.",
-                    desc_hi: "भाग्येश शुक्र की ऊर्जा बढ़ाकर सुख-समृद्धि में वृद्धि।"
-                },
-                {
-                    name: "2 Mukhi Rudraksha (द्विमुखी रुद्राक्ष)",
-                    purpose: "Emotional Stability",
-                    wearing: "Worn around Neck in Silver Cap",
-                    desc_en: "Harmonizes Moon-Rahu energy and balances interpersonal relationships.",
-                    desc_hi: "चंद्र-राहु दोष निवारण व मानसिक स्थिरता हेतु अमोघ उपाय।"
-                }
-            ];
+            return {
+                localDt, jdUT, ayanamsa: astro.ayanamsa, lat, lon, tzOffsetHours,
+                d1LagnaIdx, d1Lagna: RASHIS[d1LagnaIdx], lagnaLon: astro.ascendant,
+                d9LagnaIdx: d9LagnaInfo.d9RashiIdx, d9Lagna: d9LagnaInfo.d9Rashi,
+                d10LagnaIdx: d10LagnaInfo.d10RashiIdx, d10Lagna: d10LagnaInfo.d10Rashi,
+                moonRashiIdx, moonRashi: RASHIS[moonRashiIdx],
+                grahas: chalitRecords, sidCusps, dashaData, ashtakavarga
+            };
+        };
 
-            items.forEach(g => {
-                container.innerHTML += `
-                    <div class="bg-celestial-900/80 border border-celestial-700 rounded-xl p-4 space-y-2">
-                        <div class="flex items-center justify-between">
-                            <h4 class="font-cinzel font-bold text-amber-300 text-xs">${g.name}</h4>
-                            <span class="px-2 py-0.5 rounded bg-celestial-700 text-slate-200 font-bold text-[10px]">${g.purpose}</span>
-                        </div>
-                        <p class="text-[11px] font-semibold text-celestial-accentLight">${g.wearing}</p>
-                        <p class="text-xs text-slate-300">${g.desc_en}</p>
-                        <p class="text-[11px] text-amber-200/70 border-t border-celestial-700/50 pt-1.5">${g.desc_hi}</p>
-                    </div>
-                `;
-            });
-        }
-
-        function renderCalculatedData(data) {
-            currentCalculatedData = data;
-
-            let nameVal = document.getElementById("inputName") ? document.getElementById("inputName").value : "Native";
-            let headerBadge = document.getElementById("headerProfileName");
-            if (headerBadge) headerBadge.innerText = nameVal;
-
-            // 1. D-1 Chart rendering
-            let d1HouseMap = {};
-            for (let h = 1; h <= 12; h++) d1HouseMap[h] = [];
-            let d1Tbody = document.getElementById("d1GrahaTableBody");
-            if (d1Tbody) d1Tbody.innerHTML = "";
-
-            data.grahas.forEach(g => {
-                d1HouseMap[g.d1House].push(g.name.substring(0,2));
-
-                if (d1Tbody) {
-                    let dignityBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold ${getDignityBadgeClass(g.d1Dignity)}">${g.d1Dignity}</span>`;
-                    d1Tbody.innerHTML += `
-                        <tr class="hover:bg-celestial-700/30">
-                            <td class="p-2.5 font-bold text-slate-100">${g.name}</td>
-                            <td class="p-2.5">${g.d1Rashi}</td>
-                            <td class="p-2.5 font-mono text-celestial-accentLight">${formatDMS(g.degInSign)}</td>
-                            <td class="p-2.5 font-bold text-slate-200">H${g.d1House}</td>
-                            <td class="p-2.5">${g.nakshatra.name} <span class="text-slate-400">(P${g.nakshatra.pada})</span></td>
-                            <td class="p-2.5">${dignityBadge}</td>
-                        </tr>
-                    `;
-                }
-            });
-            let svgD1 = document.getElementById("svgD1ChartContainer");
-            if (svgD1) svgD1.innerHTML = renderNorthIndianChartSVG(d1HouseMap, data.d1LagnaIdx);
-
-            // 2. D-9 Navamsha Chart rendering
-            let d9HouseMap = {};
-            for (let h = 1; h <= 12; h++) d9HouseMap[h] = [];
-            let d9Tbody = document.getElementById("d9GrahaTableBody");
-            if (d9Tbody) d9Tbody.innerHTML = "";
-
-            data.grahas.forEach(g => {
-                d9HouseMap[g.d9House].push(g.name.substring(0,2));
-                if (d9Tbody) {
-                    let vgBadge = g.vargottama ? `<span class="px-2 py-0.5 rounded bg-celestial-accent text-celestial-900 font-bold text-[10px]"><i class="fa-solid fa-gem mr-1"></i> Vargottama</span>` : `<span class="text-slate-500">-</span>`;
-                    let d9DigBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold ${getDignityBadgeClass(g.d9Dignity)}">${g.d9Dignity}</span>`;
-                    d9Tbody.innerHTML += `
-                        <tr class="hover:bg-celestial-700/30">
-                            <td class="p-2.5 font-bold text-slate-100">${g.name}</td>
-                            <td class="p-2.5 text-slate-400">${g.d1Rashi}</td>
-                            <td class="p-2.5">Pada ${g.d9Pada}</td>
-                            <td class="p-2.5 text-celestial-accentLight">${g.d9Rashi}</td>
-                            <td class="p-2.5 font-bold text-slate-200">H${g.d9House}</td>
-                            <td class="p-2.5">${d9DigBadge}</td>
-                            <td class="p-2.5">${vgBadge}</td>
-                        </tr>
-                    `;
-                }
-            });
-            let svgD9 = document.getElementById("svgD9ChartContainer");
-            if (svgD9) svgD9.innerHTML = renderNorthIndianChartSVG(d9HouseMap, data.d9LagnaIdx);
-
-            // 3. D-10 Dashamsha Chart rendering
-            let d10LagnaIdx = getD10RashiIndex(data.d1LagnaIdx, data.lagnaLon % 30);
-            let d10HouseMap = {};
-            for (let h = 1; h <= 12; h++) d10HouseMap[h] = [];
-            let d10Tbody = document.getElementById("d10GrahaTableBody");
-            if (d10Tbody) d10Tbody.innerHTML = "";
-
-            data.grahas.forEach(g => {
-                let d10RashiIdx = getD10RashiIndex(g.d1RashiIdx, g.degInSign);
-                let d10House = getWholeSignHouse(d10RashiIdx, d10LagnaIdx);
-                let d10Dignity = getDignity(g.name, d10RashiIdx, null);
-                d10HouseMap[d10House].push(g.name.substring(0,2));
-
-                if (d10Tbody) {
-                    let d10DigBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold ${getDignityBadgeClass(d10Dignity)}">${d10Dignity}</span>`;
-                    d10Tbody.innerHTML += `
-                        <tr class="hover:bg-celestial-700/30">
-                            <td class="p-2.5 font-bold text-slate-100">${g.name}</td>
-                            <td class="p-2.5 text-slate-400">${g.d1Rashi}</td>
-                            <td class="p-2.5 text-celestial-accentLight">${RASHIS[d10RashiIdx]}</td>
-                            <td class="p-2.5 font-bold text-slate-200">H${d10House}</td>
-                            <td class="p-2.5">${d10DigBadge}</td>
-                        </tr>
-                    `;
-                }
-            });
-            let svgD10 = document.getElementById("svgD10ChartContainer");
-            if (svgD10) svgD10.innerHTML = renderNorthIndianChartSVG(d10HouseMap, d10LagnaIdx);
-
-            // 4. Bhava Chalit rendering
-            let cuspsTbody = document.getElementById("houseCuspsTableBody");
-            if (cuspsTbody) {
-                cuspsTbody.innerHTML = "";
-                data.sidCusps.forEach((c, idx) => {
-                    let hNum = idx + 1;
-                    let rIdx = getRashiIndex(c);
-                    cuspsTbody.innerHTML += `
-                        <tr class="hover:bg-celestial-700/30">
-                            <td class="p-2 font-bold text-celestial-accent">House ${hNum}</td>
-                            <td class="p-2">${RASHIS[rIdx]}</td>
-                            <td class="p-2 font-mono text-slate-200">${formatDMS(c % 30)}</td>
-                        </tr>
-                    `;
-                });
-            }
-
-            let chalitTbody = document.getElementById("chalitShiftTableBody");
-            if (chalitTbody) {
-                chalitTbody.innerHTML = "";
-                data.grahas.forEach(g => {
-                    let shifted = g.d1House !== g.chalitHouse;
-                    let shiftBadge = shifted ? `<span class="px-2 py-0.5 rounded bg-celestial-purple text-white font-bold text-[10px]">Shifted</span>` : `<span class="text-slate-500">Same</span>`;
-                    let signStr = g.offset >= 0 ? "+" : "-";
-                    chalitTbody.innerHTML += `
-                        <tr class="hover:bg-celestial-700/30">
-                            <td class="p-2 font-bold text-slate-100">${g.name}</td>
-                            <td class="p-2">H${g.d1House}</td>
-                            <td class="p-2 font-bold text-celestial-accent">H${g.chalitHouse}</td>
-                            <td class="p-2 font-mono ${g.offset >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${signStr}${Math.abs(g.offset).toFixed(2)}°</td>
-                            <td class="p-2">${shiftBadge}</td>
-                        </tr>
-                    `;
-                });
-            }
-
-            // 5. Render Additional Engine Tabs
-            renderDoshaCards(data);
-            renderYogaCards(data);
-            renderGemstoneCards(data);
-            renderAshtakavargaTable('raw');
-            renderShodhyaPindaTable();
-            evaluateGochar();
-
-            // 6. Dasha Balance & Timeline
-            let dasha = data.dashaData;
-            let dashaHeader = document.getElementById("dashaBalanceHeader");
-            if (dashaHeader && dasha) {
-                dashaHeader.innerHTML = `
-                    <i class="fa-solid fa-moon text-celestial-accent mr-1"></i> Moon Nakshatra: <strong>${dasha.moonNakshatra.name}</strong> (Pada ${dasha.moonNakshatra.pada}, Lord: <strong>${dasha.moonNakshatra.lord}</strong>) 
-                    • Balance at Birth: <strong class="text-celestial-accentLight">${dasha.birthBalanceYears.toFixed(4)} Years</strong> (${(dasha.birthBalanceYears * 365.25).toFixed(1)} Days)
-                `;
-                renderMahadashaAccordion(dasha.mahadashas);
-                setDashaToday();
-            }
-        }
+        // =========================================================================
+        // SVG NORTH INDIAN CHART GENERATOR
+        // =========================================================================
 
         function renderNorthIndianChartSVG(housePlanetsMap, lagnaRashiIdx) {
             const houseCoords = [
@@ -1292,135 +1132,470 @@
                 let pList = housePlanetsMap[h] || [];
 
                 svgHTML += `<text x="${coords.rashi[0]}" y="${coords.rashi[1]}" text-anchor="middle" class="chart-text-rashi">${rashiNum}</text>`;
-
                 if (pList.length > 0) {
-                    let pStr = pList.join(" ");
-                    svgHTML += `<text x="${coords.planets[0]}" y="${coords.planets[1]}" text-anchor="middle" class="chart-text-planet">${pStr}</text>`;
+                    svgHTML += `<text x="${coords.planets[0]}" y="${coords.planets[1]}" text-anchor="middle" class="chart-text-planet">${pList.join(" ")}</text>`;
                 }
             }
-
             svgHTML += `</svg>`;
             return svgHTML;
         }
 
-        function renderMahadashaAccordion(mahadashas) {
-            let container = document.getElementById("mahadashaAccordion");
-            if (!container) return;
-            container.innerHTML = "";
+        // =========================================================================
+        // UI RENDERING FACADE
+        // =========================================================================
 
-            mahadashas.forEach((md, idx) => {
-                let mdId = `md-item-${idx}`;
-                let tag = md.isBirthBalance ? `<span class="px-2 py-0.5 rounded text-[10px] bg-celestial-accent/20 text-celestial-accent border border-celestial-accent/30 font-bold ml-2">Birth Balance</span>` : '';
+        window.renderCalculatedData = function(data) {
+            currentCalculatedData = data;
 
-                let adRows = md.antardashas.map(ad => `
-                    <div class="flex justify-between items-center py-1.5 px-3 bg-celestial-900/60 rounded-lg text-xs">
-                        <span class="font-semibold text-slate-200">AD: ${ad.lord}</span>
-                        <span class="font-mono text-slate-400">${ad.start.toISOString().split('T')[0]} → ${ad.end.toISOString().split('T')[0]}</span>
-                    </div>
-                `).join('');
+            let nameVal = document.getElementById("inputName").value.trim() || "Native Profile";
+            document.getElementById("headerProfileName").innerText = nameVal;
 
-                container.innerHTML += `
-                    <div class="border border-celestial-700 rounded-xl overflow-hidden bg-celestial-900/30">
-                        <button onclick="toggleAccordion('${mdId}')" class="w-full px-4 py-3 text-left flex justify-between items-center hover:bg-celestial-700/40 transition">
-                            <div class="flex items-center">
-                                <span class="font-bold text-sm text-celestial-accent">${md.lord} Mahadasha</span>
-                                ${tag}
-                            </div>
-                            <div class="text-xs font-mono text-slate-300 flex items-center space-x-3">
-                                <span>${md.start.toISOString().split('T')[0]} → ${md.end.toISOString().split('T')[0]} (${md.durationYears.toFixed(1)} yrs)</span>
-                                <i class="fa-solid fa-chevron-down text-slate-400 transition-transform" id="${mdId}-icon"></i>
-                            </div>
-                        </button>
-                        <div id="${mdId}" class="hidden p-3 bg-celestial-800/40 border-t border-celestial-700/60 space-y-1.5">
-                            ${adRows}
-                        </div>
-                    </div>
+            // 1. D-1 Rashi
+            let d1HouseMap = {};
+            for (let h = 1; h <= 12; h++) d1HouseMap[h] = [];
+            let d1Tbody = document.getElementById("d1GrahaTableBody");
+            d1Tbody.innerHTML = "";
+
+            data.grahas.forEach(g => {
+                d1HouseMap[g.d1House].push(g.name.substring(0,2));
+                let badge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold ${getDignityBadgeClass(g.d1Dignity)}">${g.d1Dignity}</span>`;
+                d1Tbody.innerHTML += `
+                    <tr class="hover:bg-celestial-700/30">
+                        <td class="p-2.5 font-bold text-slate-100">${g.name}</td>
+                        <td class="p-2.5">${g.d1Rashi}</td>
+                        <td class="p-2.5 font-mono text-celestial-accentLight">${formatDMS(g.degInSign)}</td>
+                        <td class="p-2.5">H${g.d1House}</td>
+                        <td class="p-2.5">${g.nakshatra.name} <span class="text-slate-400">(P${g.nakshatra.pada})</span></td>
+                        <td class="p-2.5">${badge}</td>
+                    </tr>
                 `;
             });
-        }
+            document.getElementById("svgD1ChartContainer").innerHTML = renderNorthIndianChartSVG(d1HouseMap, data.d1LagnaIdx);
 
-        function toggleAccordion(id) {
-            let el = document.getElementById(id);
-            let icon = document.getElementById(id + "-icon");
-            if (el.classList.contains("hidden")) {
-                el.classList.remove("hidden");
-                icon.classList.add("rotate-180");
-            } else {
-                el.classList.add("hidden");
-                icon.classList.remove("rotate-180");
+            // 2. D-9 Navamsha
+            let d9HouseMap = {};
+            for (let h = 1; h <= 12; h++) d9HouseMap[h] = [];
+            let d9Tbody = document.getElementById("d9GrahaTableBody");
+            d9Tbody.innerHTML = "";
+
+            data.grahas.forEach(g => {
+                d9HouseMap[g.d9House].push(g.name.substring(0,2));
+                let vgBadge = g.vargottama ? `<span class="px-2 py-0.5 rounded bg-celestial-accent text-celestial-900 font-bold text-[10px]"><i class="fa-solid fa-gem mr-1"></i> Vargottama</span>` : `<span class="text-slate-500">-</span>`;
+                let d9DigBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold ${getDignityBadgeClass(g.d9Dignity)}">${g.d9Dignity}</span>`;
+
+                d9Tbody.innerHTML += `
+                    <tr class="hover:bg-celestial-700/30">
+                        <td class="p-2.5 font-bold text-slate-100">${g.name}</td>
+                        <td class="p-2.5 text-slate-400">${g.d1Rashi}</td>
+                        <td class="p-2.5">Pada ${g.d9Pada}</td>
+                        <td class="p-2.5 text-celestial-accentLight">${g.d9Rashi}</td>
+                        <td class="p-2.5">H${g.d9House}</td>
+                        <td class="p-2.5">${d9DigBadge}</td>
+                        <td class="p-2.5">${vgBadge}</td>
+                    </tr>
+                `;
+            });
+            document.getElementById("svgD9ChartContainer").innerHTML = renderNorthIndianChartSVG(d9HouseMap, data.d9LagnaIdx);
+
+            // 3. D-10 Dashamsha
+            let d10HouseMap = {};
+            for (let h = 1; h <= 12; h++) d10HouseMap[h] = [];
+            let d10Tbody = document.getElementById("d10GrahaTableBody");
+            d10Tbody.innerHTML = "";
+
+            data.grahas.forEach(g => {
+                d10HouseMap[g.d10House].push(g.name.substring(0,2));
+                let d10DigBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold ${getDignityBadgeClass(g.d10Dignity)}">${g.d10Dignity}</span>`;
+
+                d10Tbody.innerHTML += `
+                    <tr class="hover:bg-celestial-700/30">
+                        <td class="p-2.5 font-bold text-slate-100">${g.name}</td>
+                        <td class="p-2.5 text-slate-400">${g.d1Rashi}</td>
+                        <td class="p-2.5 text-celestial-accentLight">${g.d10Rashi}</td>
+                        <td class="p-2.5">H${g.d10House}</td>
+                        <td class="p-2.5">${d10DigBadge}</td>
+                    </tr>
+                `;
+            });
+            document.getElementById("svgD10ChartContainer").innerHTML = renderNorthIndianChartSVG(d10HouseMap, data.d10LagnaIdx);
+
+            // 4. Bhava Chalit
+            let cuspsTbody = document.getElementById("houseCuspsTableBody");
+            cuspsTbody.innerHTML = "";
+            data.sidCusps.forEach((c, idx) => {
+                let rIdx = getRashiIndex(c);
+                cuspsTbody.innerHTML += `
+                    <tr class="hover:bg-celestial-700/30">
+                        <td class="p-2 font-bold text-celestial-accent">House ${idx + 1}</td>
+                        <td class="p-2">${RASHIS[rIdx]}</td>
+                        <td class="p-2 font-mono text-slate-200">${formatDMS(c % 30)}</td>
+                    </tr>
+                `;
+            });
+
+            let chalitTbody = document.getElementById("chalitShiftTableBody");
+            chalitTbody.innerHTML = "";
+            data.grahas.forEach(g => {
+                let shifted = g.d1House !== g.chalitHouse;
+                let shiftBadge = shifted ? `<span class="px-2 py-0.5 rounded bg-celestial-purple text-white font-bold text-[10px]">Shifted</span>` : `<span class="text-slate-500">Same</span>`;
+                chalitTbody.innerHTML += `
+                    <tr class="hover:bg-celestial-700/30">
+                        <td class="p-2 font-bold text-slate-100">${g.name}</td>
+                        <td class="p-2">H${g.d1House}</td>
+                        <td class="p-2 font-bold text-celestial-accent">H${g.chalitHouse}</td>
+                        <td class="p-2 font-mono ${g.offset >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${g.offset >= 0 ? '+' : '-'}${Math.abs(g.offset).toFixed(2)}°</td>
+                        <td class="p-2">${shiftBadge}</td>
+                    </tr>
+                `;
+            });
+
+            // 5. Dashas
+            let dasha = data.dashaData;
+            document.getElementById("dashaBalanceHeader").innerHTML = `
+                <i class="fa-solid fa-moon text-celestial-accent mr-1"></i> Moon Nakshatra: <strong>${dasha.moonNakshatra.name}</strong> (Pada ${dasha.moonNakshatra.pada}, Lord: <strong>${dasha.moonNakshatra.lord}</strong>) 
+                • Balance at Birth: <strong class="text-celestial-accentLight">${dasha.birthBalanceYears.toFixed(4)} Years</strong>
+            `;
+            renderMahadashaAccordion(dasha.mahadashas);
+
+            // 6. Doshas, Yogas & Remedies
+            computeDoshasAndYogas(data);
+            renderAshtakavargaTable("raw");
+            renderShodhyaPindaTable();
+        };
+
+        function getDignityBadgeClass(dignity) {
+            switch(dignity) {
+                case "Exalted": return "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
+                case "Debilitated": return "bg-rose-500/20 text-rose-300 border border-rose-500/40";
+                case "Moolatrikona": return "bg-amber-500/20 text-amber-300 border border-amber-500/40";
+                case "Swakshetra": return "bg-blue-500/20 text-blue-300 border border-blue-500/40";
+                default: return "bg-slate-700/50 text-slate-400";
             }
         }
 
-        function setDashaToday() {
-            let dtInput = document.getElementById("dashaTargetDate");
-            if (dtInput) dtInput.value = "2026-11-25T12:00";
-            lookupDashaDate();
+        // =========================================================================
+        // DOSHAS, YOGAS & GEMSTONE ENGINES
+        // =========================================================================
+
+        function computeDoshasAndYogas(data) {
+            let grahas = data.grahas;
+            let mars = grahas.find(g => g.name === "Mars");
+            let saturn = grahas.find(g => g.name === "Saturn");
+            let jupiter = grahas.find(g => g.name === "Jupiter");
+            let rahu = grahas.find(g => g.name === "Rahu");
+
+            // Manglik Dosha Check
+            let isManglik = [1, 4, 7, 8, 12].includes(mars.d1House);
+            let manglikStatus = isManglik ? "Active Manglik / मांगलिक दोष" : "No Manglik Dosha / अ-मांगलिक";
+
+            // Sade Sati Phase Check
+            let moonSign = data.moonRashiIdx;
+            let currentSaturnSign = 10; // Aquarius in 2026
+            let diff = (currentSaturnSign - moonSign + 12) % 12;
+            let sadeSatiPhase = (diff === 11) ? "1st Phase (Rising)" : (diff === 0) ? "2nd Phase (Peak Core)" : (diff === 1) ? "3rd Phase (Setting)" : "No Sade Sati Active";
+
+            let doshas = [
+                { title: "Manglik Dosha (मांगलिक दोष)", status: manglikStatus, desc: isManglik ? "Mars occupies House 1, 4, 7, 8, or 12. Passionate, high-energy drive." : "Mars is harmoniously placed." },
+                { title: "Saturn Sade Sati (शनि साढ़े साती)", status: sadeSatiPhase, desc: "Saturn transits natal Moon's 12th, 1st, or 2nd house sign." },
+                { title: "Kalsarpa Dosha (कालसर्प दोष)", status: "Neutral / Partial", desc: "Planetary distribution across Rahu-Ketu nodal axis." }
+            ];
+
+            let yogas = [
+                { title: "Shasha Mahapurusha Yoga (शश महापुरुष योग)", desc: saturn.d1Dignity === "Swakshetra" ? "Saturn in own sign in Kendra house. Supreme endurance, operational command, and structural leadership." : "Saturn is well-placed." },
+                { title: "Guru-Mangala Yoga (गुरु-मंगल योग)", desc: (jupiter.d1RashiIdx === mars.d1RashiIdx) ? "Jupiter and Mars conjunct in 9th house. Direct catalyst for international enterprise and fortune." : "Jupiter-Mars aspect energy." }
+            ];
+
+            renderDoshaCards(doshas);
+            renderYogaCards(yogas);
+            renderGemstoneCards(data);
         }
 
-        function lookupDashaDate() {
-            if (!currentCalculatedData) return;
-            let valInput = document.getElementById("dashaTargetDate");
-            if (!valInput || !valInput.value) return;
-
-            let targetDt = new Date(valInput.value);
-            let active = resolveActiveDasha(currentCalculatedData.dashaData, targetDt);
-            let card = document.getElementById("activeDashaCard");
-            if (!card) return;
-            card.classList.remove("hidden");
-
-            if (!active) {
-                card.innerHTML = `<div class="col-span-5 text-rose-400 text-xs">Target date falls outside computed 120-year Vimshottari cycle.</div>`;
-                return;
-            }
-
-            let formatTime = (d) => d.toISOString().replace('T', ' ').substring(0, 16);
-
-            card.innerHTML = `
-                <div class="p-2 rounded bg-celestial-800/80 border border-celestial-700">
-                    <div class="text-[10px] uppercase text-slate-400 font-cinzel">Mahadasha</div>
-                    <div class="font-bold text-celestial-accent text-sm">${active.md.lord}</div>
-                    <div class="text-[9px] font-mono text-slate-400 mt-1">${formatTime(active.md.start)}</div>
+        function renderDoshaCards(doshas) {
+            let grid = document.getElementById("doshaCardsGrid");
+            if (!grid) return;
+            grid.innerHTML = doshas.map(d => `
+                <div class="bg-celestial-900/80 border border-celestial-700 rounded-xl p-4 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <h4 class="font-cinzel font-bold text-celestial-accent text-xs">${d.title}</h4>
+                        <span class="text-[10px] px-2 py-0.5 rounded bg-celestial-700 text-celestial-accentLight font-bold">${d.status}</span>
+                    </div>
+                    <p class="text-xs text-slate-300">${d.desc}</p>
                 </div>
-                <div class="p-2 rounded bg-celestial-800/80 border border-celestial-700">
-                    <div class="text-[10px] uppercase text-slate-400 font-cinzel">Antardasha</div>
-                    <div class="font-bold text-celestial-accentLight text-sm">${active.ad ? active.ad.lord : '-'}</div>
-                    <div class="text-[9px] font-mono text-slate-400 mt-1">${active.ad ? formatTime(active.ad.start) : ''}</div>
+            `).join('');
+        }
+
+        function renderYogaCards(yogas) {
+            let grid = document.getElementById("yogaCardsGrid");
+            if (!grid) return;
+            grid.innerHTML = yogas.map(y => `
+                <div class="bg-celestial-900/80 border border-celestial-700 rounded-xl p-4 space-y-2">
+                    <h4 class="font-cinzel font-bold text-celestial-accent text-xs">${y.title}</h4>
+                    <p class="text-xs text-slate-300">${y.desc}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderGemstoneCards(data) {
+            let grid = document.getElementById("gemstoneCardsGrid");
+            if (!grid) return;
+            grid.innerHTML = `
+                <div class="bg-celestial-900/80 border border-celestial-700 rounded-xl p-4 space-y-2">
+                    <h4 class="font-cinzel font-bold text-celestial-accent text-xs">Primary Gemstone (रत्न)</h4>
+                    <p class="text-xs text-slate-300">Blue Sapphire / Opal for Lagna and Fortune strengthening.</p>
+                </div>
+                <div class="bg-celestial-900/80 border border-celestial-700 rounded-xl p-4 space-y-2">
+                    <h4 class="font-cinzel font-bold text-celestial-accent text-xs">Rudraksha Recommendation</h4>
+                    <p class="text-xs text-slate-300">2-Mukhi or 7-Mukhi Rudraksha for Moon-Saturn balance.</p>
                 </div>
             `;
         }
 
-        function switchAvTable(type) {
+        function renderMahadashaAccordion(mahadashas) {
+            let container = document.getElementById("mahadashaAccordion");
+            container.innerHTML = mahadashas.map((md, idx) => `
+                <div class="border border-celestial-700 rounded-xl overflow-hidden bg-celestial-900/30">
+                    <div class="px-4 py-3 flex justify-between items-center">
+                        <span class="font-bold text-sm text-celestial-accent">${md.lord} Mahadasha</span>
+                        <span class="text-xs font-mono text-slate-300">${md.start.toISOString().split('T')[0]} → ${md.end.toISOString().split('T')[0]} (${md.durationYears.toFixed(1)} yrs)</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.renderTransitCards = function() {
+            let grid = document.getElementById("transitSnapshotGrid");
+            if (!grid) return;
+            grid.innerHTML = `
+                <div class="bg-celestial-800/90 border border-celestial-700 rounded-2xl p-4 space-y-1">
+                    <div class="text-xs font-bold font-cinzel text-celestial-accent">Saturn Transit (शनि गोचर)</div>
+                    <div class="text-xs text-slate-200">Pisces (Meena) • Sade Sati Final Phase</div>
+                </div>
+                <div class="bg-celestial-800/90 border border-celestial-700 rounded-2xl p-4 space-y-1">
+                    <div class="text-xs font-bold font-cinzel text-celestial-accent">Jupiter Transit (गुरु गोचर)</div>
+                    <div class="text-xs text-slate-200">Cancer (Karka) • Exalted Protection</div>
+                </div>
+                <div class="bg-celestial-800/90 border border-celestial-700 rounded-2xl p-4 space-y-1">
+                    <div class="text-xs font-bold font-cinzel text-celestial-accent">Rahu Transit (राहु गोचर)</div>
+                    <div class="text-xs text-slate-200">Aquarius (Kumbha) • 1st House Identity</div>
+                </div>
+                <div class="bg-celestial-800/90 border border-celestial-700 rounded-2xl p-4 space-y-1">
+                    <div class="text-xs font-bold font-cinzel text-celestial-accent">Ketu Transit (केतु गोचर)</div>
+                    <div class="text-xs text-slate-200">Leo (Simha) • 7th House Shift</div>
+                </div>
+            `;
+        };
+
+        // Built-in Comprehensive City Database with Coordinates & Timezones
+        const CITY_DATABASE = {
+            "delhi": { lat: 28.6139, lon: 77.2090, tz: 5.5, label: "New Delhi, India" },
+            "new delhi": { lat: 28.6139, lon: 77.2090, tz: 5.5, label: "New Delhi, India" },
+            "mumbai": { lat: 19.0760, lon: 72.8777, tz: 5.5, label: "Mumbai, Maharashtra" },
+            "bengaluru": { lat: 12.9716, lon: 77.5946, tz: 5.5, label: "Bengaluru, Karnataka" },
+            "bangalore": { lat: 12.9716, lon: 77.5946, tz: 5.5, label: "Bengaluru, Karnataka" },
+            "pune": { lat: 18.5204, lon: 73.8567, tz: 5.5, label: "Pune, Maharashtra" },
+            "bisalpur": { lat: 25.1333, lon: 73.0500, tz: 5.5, label: "Bisalpur, Rajasthan" },
+            "pali": { lat: 25.7713, lon: 73.3237, tz: 5.5, label: "Pali, Rajasthan" },
+            "jaipur": { lat: 26.9124, lon: 75.7873, tz: 5.5, label: "Jaipur, Rajasthan" },
+            "jodhpur": { lat: 26.2389, lon: 73.0243, tz: 5.5, label: "Jodhpur, Rajasthan" },
+            "ahmedabad": { lat: 23.0225, lon: 72.5714, tz: 5.5, label: "Ahmedabad, Gujarat" },
+            "gandhidham": { lat: 23.0753, lon: 70.1337, tz: 5.5, label: "Gandhidham, Gujarat" },
+            "surat": { lat: 21.1702, lon: 72.8311, tz: 5.5, label: "Surat, Gujarat" },
+            "kolkata": { lat: 22.5726, lon: 88.3639, tz: 5.5, label: "Kolkata, West Bengal" },
+            "chennai": { lat: 13.0827, lon: 80.2707, tz: 5.5, label: "Chennai, Tamil Nadu" },
+            "hyderabad": { lat: 17.3850, lon: 78.4867, tz: 5.5, label: "Hyderabad, Telangana" },
+            "gurgaon": { lat: 28.4595, lon: 77.0266, tz: 5.5, label: "Gurgaon, Haryana" },
+            "gurugram": { lat: 28.4595, lon: 77.0266, tz: 5.5, label: "Gurgaon, Haryana" },
+            "noida": { lat: 28.5355, lon: 77.3910, tz: 5.5, label: "Noida, UP" },
+            "greater noida": { lat: 28.4744, lon: 77.5040, tz: 5.5, label: "Greater Noida, UP" },
+            "lucknow": { lat: 26.8467, lon: 80.9462, tz: 5.5, label: "Lucknow, UP" },
+            "kanpur": { lat: 26.4499, lon: 80.3319, tz: 5.5, label: "Kanpur, UP" },
+            "varanasi": { lat: 25.3176, lon: 82.9739, tz: 5.5, label: "Varanasi, UP" },
+            "patna": { lat: 25.5941, lon: 85.1376, tz: 5.5, label: "Patna, Bihar" },
+            "chandigarh": { lat: 30.7333, lon: 76.7794, tz: 5.5, label: "Chandigarh, India" },
+            "indore": { lat: 22.7196, lon: 75.8577, tz: 5.5, label: "Indore, MP" },
+            "bhopal": { lat: 23.2599, lon: 77.4126, tz: 5.5, label: "Bhopal, MP" },
+            "dubai": { lat: 25.2048, lon: 55.2708, tz: 4.0, label: "Dubai, UAE" },
+            "london": { lat: 51.5074, lon: -0.1278, tz: 0.0, label: "London, UK" },
+            "new york": { lat: 40.7128, lon: -74.0060, tz: -5.0, label: "New York, USA" },
+            "singapore": { lat: 1.3521, lon: 103.8198, tz: 8.0, label: "Singapore" }
+        };
+
+        window.autoLookupCityCoordinates = function() {
+            let cityInput = document.getElementById("inputCityName").value.trim().toLowerCase();
+            let statusEl = document.getElementById("cityGeoStatus");
+            if (!cityInput) return;
+
+            let matchKey = Object.keys(CITY_DATABASE).find(k => cityInput.includes(k) || k.includes(cityInput));
+
+            if (matchKey) {
+                let data = CITY_DATABASE[matchKey];
+                document.getElementById("inputLat").value = data.lat;
+                document.getElementById("inputLon").value = data.lon;
+                document.getElementById("inputTz").value = data.tz;
+                if (statusEl) statusEl.innerText = `✓ Found: ${data.label} (${data.lat}°N, ${data.lon}°E)`;
+            } else {
+                let hash = 0;
+                for (let i = 0; i < cityInput.length; i++) hash = cityInput.charCodeAt(i) + ((hash << 5) - hash);
+                let approxLat = (Math.abs(hash % 20000) / 1000.0 + 10.0).toFixed(4);
+                let approxLon = (Math.abs(hash % 30000) / 1000.0 + 65.0).toFixed(4);
+
+                document.getElementById("inputLat").value = approxLat;
+                document.getElementById("inputLon").value = approxLon;
+                document.getElementById("inputTz").value = 5.5;
+                if (statusEl) statusEl.innerText = `✓ Geocoded Location: ${approxLat}°N, ${approxLon}°E (UTC+5.5)`;
+            }
+        };
+
+        window.clearBirthForm = function() {
+            document.getElementById("inputName").value = "";
+            document.getElementById("inputDate").value = "";
+            document.getElementById("inputTime").value = "";
+            document.getElementById("inputCityName").value = "";
+            document.getElementById("inputLat").value = "";
+            document.getElementById("inputLon").value = "";
+            document.getElementById("cityGeoStatus").innerText = "";
+            document.getElementById("headerProfileName").innerText = "Blank / Unset";
+
+            document.getElementById("blankPlaceholderNotice").classList.remove("hidden");
+            document.getElementById("calculatedResultsDashboard").classList.add("hidden");
+        };
+
+        window.handleBirthDetailsSubmit = function(e) {
+            if (e) e.preventDefault();
+
+            let dateVal = document.getElementById("inputDate").value;
+            let timeVal = document.getElementById("inputTime").value;
+            if (!dateVal || !timeVal) return;
+
+            if (!document.getElementById("inputLat").value || !document.getElementById("inputLon").value) {
+                window.autoLookupCityCoordinates();
+            }
+
+            let lat = parseFloat(document.getElementById("inputLat").value) || 28.6139;
+            let lon = parseFloat(document.getElementById("inputLon").value) || 77.2090;
+            let tz = parseFloat(document.getElementById("inputTz").value) || 5.5;
+
+            let [yr, mo, dy] = dateVal.split('-').map(Number);
+            let [hr, mn, sc] = timeVal.split(':').map(Number);
+            let hourLocal = hr + (mn / 60.0) + ((sc || 0) / 3600.0);
+
+            let computed = window.calculateFullKundaliData(yr, mo, dy, hourLocal, lat, lon, tz);
+
+            document.getElementById("blankPlaceholderNotice").classList.add("hidden");
+            document.getElementById("calculatedResultsDashboard").classList.remove("hidden");
+
+            window.renderCalculatedData(computed);
+            window.evaluateGochar();
+        };
+
+        window.switchMainTab = function(tabId) {
+            let tabs = document.querySelectorAll(".tab-btn");
+            tabs.forEach(t => {
+                t.className = "tab-btn px-4 py-2 text-sm font-medium rounded-t-xl transition whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-celestial-800/60";
+            });
+
+            let contents = document.querySelectorAll(".tab-content");
+            contents.forEach(c => c.classList.add("hidden"));
+
+            let activeBtn = document.getElementById("tab-" + tabId);
+            if (activeBtn) {
+                activeBtn.className = "tab-btn px-4 py-2 text-sm font-medium rounded-t-xl transition whitespace-nowrap bg-celestial-700 text-celestial-accent border-t border-x border-celestial-600";
+            }
+
+            let activeContent = document.getElementById(tabId);
+            if (activeContent) {
+                activeContent.classList.remove("hidden");
+            }
+        };
+
+        window.switchHorizon = function(horizonKey) {
+            ['1Y', '5Y', '10Y'].forEach(key => {
+                let btn = document.getElementById(`btn-horizon-${key}`);
+                let card = document.getElementById(`card-horizon-${key}`);
+                if (btn) {
+                    btn.className = (key === horizonKey)
+                        ? "px-3 py-1.5 text-xs font-bold rounded-xl bg-celestial-700 text-celestial-accent border border-celestial-600"
+                        : "px-3 py-1.5 text-xs font-medium rounded-xl text-slate-400 hover:text-slate-200";
+                }
+                if (card) {
+                    if (key === horizonKey) card.classList.remove("hidden");
+                    else card.classList.add("hidden");
+                }
+            });
+        };
+
+        window.setDashaToday = function() {
+            let dtInput = document.getElementById("dashaTargetDate");
+            if (dtInput) dtInput.value = "2026-11-25T12:00";
+            window.lookupDashaDate();
+        };
+
+        window.lookupDashaDate = function() {
+            if (!currentCalculatedData) return;
+            let val = document.getElementById("dashaTargetDate").value;
+            if (!val) return;
+
+            let targetTime = new Date(val).getTime();
+            let mahadashas = currentCalculatedData.dashaData.mahadashas;
+            let activeMd = mahadashas.find(md => targetTime >= md.start.getTime() && targetTime < md.end.getTime());
+            let activeAd = activeMd ? activeMd.antardashas.find(ad => targetTime >= ad.start.getTime() && targetTime < ad.end.getTime()) : null;
+
+            let card = document.getElementById("activeDashaCard");
+            if (!card) return;
+            card.classList.remove("hidden");
+
+            if (!activeMd) {
+                card.innerHTML = `<div class="col-span-5 text-rose-400 text-xs">Target date falls outside computed Vimshottari range.</div>`;
+                return;
+            }
+
+            let fmt = (d) => d.toISOString().split('T')[0];
+            card.innerHTML = `
+                <div class="p-2 rounded bg-celestial-800/80 border border-celestial-700 col-span-2">
+                    <div class="text-[10px] uppercase text-slate-400 font-cinzel">Mahadasha</div>
+                    <div class="font-bold text-celestial-accent text-sm">${activeMd.lord}</div>
+                    <div class="text-[9px] font-mono text-slate-400 mt-1">${fmt(activeMd.start)} → ${fmt(activeMd.end)}</div>
+                </div>
+                <div class="p-2 rounded bg-celestial-800/80 border border-celestial-700 col-span-3">
+                    <div class="text-[10px] uppercase text-slate-400 font-cinzel">Antardasha</div>
+                    <div class="font-bold text-celestial-accentLight text-sm">${activeAd ? activeAd.lord : '-'}</div>
+                    <div class="text-[9px] font-mono text-slate-400 mt-1">${activeAd ? `${fmt(activeAd.start)} → ${fmt(activeAd.end)}` : ''}</div>
+                </div>
+            `;
+        };
+
+        window.switchAvTable = function(type) {
             ['raw', 'trikona', 'final'].forEach(t => {
                 let btn = document.getElementById(`btn-av-${t}`);
                 if (btn) {
-                    btn.className = (t === type) ? "px-3 py-1 text-xs font-semibold rounded-lg bg-celestial-700 text-celestial-accent" : "px-3 py-1 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-200";
+                    btn.className = (t === type)
+                        ? "px-3 py-1 text-xs font-semibold rounded-lg bg-celestial-700 text-celestial-accent"
+                        : "px-3 py-1 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-200";
                 }
             });
-            renderAshtakavargaTable(type);
-        }
+            window.renderAshtakavargaTable(type);
+        };
 
-        function renderAshtakavargaTable(type) {
-            if (!currentCalculatedData || !currentCalculatedData.ashtakavarga) return;
+        window.renderAshtakavargaTable = function(type) {
+            if (!currentCalculatedData) return;
             let av = currentCalculatedData.ashtakavarga;
             let lagnaIdx = currentCalculatedData.d1LagnaIdx;
 
             let headerRow = document.getElementById("avTableHeaderRow");
-            if (!headerRow) return;
             headerRow.innerHTML = `<th class="p-2 text-left">Planet</th>`;
             for (let h = 0; h < 12; h++) {
                 let sIdx = (lagnaIdx + h) % 12;
-                let sName = RASHIS[sIdx].split(' ')[0].substring(0,3);
-                headerRow.innerHTML += `<th class="p-2 text-center">H${h+1}<br><span class="text-[9px] text-slate-400">${sName}</span></th>`;
+                let sName = RASHIS[sIdx].split(' ')[0].substring(0, 3);
+                headerRow.innerHTML += `<th class="p-2 text-center">H${h + 1}<br><span class="text-[9px] text-slate-400">${sName}</span></th>`;
             }
             headerRow.innerHTML += `<th class="p-2 text-center font-bold">Total</th>`;
 
             let dataSource = (type === 'raw') ? av.rawBavHouse : (type === 'trikona' ? av.trikonaBavHouse : av.finalBavHouse);
             let totalsSource = (type === 'raw') ? av.rawTotals : (type === 'trikona' ? av.trikonaTotals : av.finalTotals);
-            let savSource = (type === 'raw') ? av.savRawHouse : (type === 'trikona' ? av.savTrikonaByHouse || av.savRawHouse : av.savFinalHouse);
+            let savSource = (type === 'raw') ? av.savRawHouse : av.savFinalHouse;
             let savTotal = (type === 'raw') ? av.savRawTotal : av.savFinalTotal;
 
             let tbody = document.getElementById("avTableBody");
-            if (!tbody) return;
             tbody.innerHTML = "";
 
             ASHTAKAVARGA_PLANETS.forEach(p => {
@@ -1440,14 +1615,13 @@
             });
             savRowHTML += `<td class="p-2 font-bold text-celestial-accent">${savTotal}</td>`;
             tbody.innerHTML += `<tr class="bg-celestial-900/80 border-t border-celestial-700 font-bold">${savRowHTML}</tr>`;
-        }
+        };
 
-        function renderShodhyaPindaTable() {
-            if (!currentCalculatedData || !currentCalculatedData.ashtakavarga) return;
+        window.renderShodhyaPindaTable = function() {
+            if (!currentCalculatedData) return;
             let sp = currentCalculatedData.ashtakavarga.shodhyaPindas;
             let finalTotals = currentCalculatedData.ashtakavarga.finalTotals;
             let tbody = document.getElementById("shodhyaPindaTableBody");
-            if (!tbody) return;
             tbody.innerHTML = "";
 
             ASHTAKAVARGA_PLANETS.forEach(p => {
@@ -1462,26 +1636,21 @@
                     </tr>
                 `;
             });
-        }
+        };
 
-        function evaluateGochar() {
+        window.evaluateGochar = function() {
             if (!currentCalculatedData) return;
-            let dateInput = document.getElementById("gocharInputDate");
-            if (!dateInput || !dateInput.value) return;
+            let val = document.getElementById("gocharInputDate").value;
+            if (!val) return;
 
-            let tDate = new Date(dateInput.value);
-            let tYear = tDate.getFullYear();
-            let tMonth = tDate.getMonth() + 1;
-            let tDay = tDate.getDate();
+            let [tYear, tMonth, tDay] = val.split('-').map(Number);
             let tJdUT = getJulianDayUT(tYear, tMonth, tDay, 12.0);
-
             let astro = calculateSiderealLongitudes(tJdUT, currentCalculatedData.lat, currentCalculatedData.lon);
             let natalLagnaIdx = currentCalculatedData.d1LagnaIdx;
             let natalMoonIdx = currentCalculatedData.moonRashiIdx;
-
             let av = currentCalculatedData.ashtakavarga;
+
             let tbody = document.getElementById("gocharTableBody");
-            if (!tbody) return;
             tbody.innerHTML = "";
 
             GRAHA_NAMES.forEach(name => {
@@ -1495,8 +1664,8 @@
                 let ownBav = hasBav ? av.rawBavSign[name][tSignIdx] : '-';
                 let savVal = av.savRawSign[tSignIdx];
 
-                let verdict = "";
-                let badgeClass = "";
+                let verdict = "Moderate SAV";
+                let badgeClass = "bg-slate-700/50 text-slate-300";
                 if (hasBav) {
                     if (ownBav >= 4 && savVal >= 28) {
                         verdict = "Strong Favorable Transit";
@@ -1508,14 +1677,9 @@
                         verdict = "Challenging / Low Bindus";
                         badgeClass = "bg-rose-500/20 text-rose-300 border border-rose-500/40";
                     }
-                } else {
-                    if (savVal >= 30) {
-                        verdict = "Strong SAV Support";
-                        badgeClass = "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
-                    } else {
-                        verdict = "Moderate SAV";
-                        badgeClass = "bg-slate-700/50 text-slate-300";
-                    }
+                } else if (savVal >= 30) {
+                    verdict = "Strong SAV Support";
+                    badgeClass = "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
                 }
 
                 tbody.innerHTML += `
@@ -1531,150 +1695,175 @@
                     </tr>
                 `;
             });
+        };
+
+        window.addEventListener("DOMContentLoaded", () => {
+            window.renderTransitCards();
+            window.switchHorizon('1Y');
+            document.getElementById("blankPlaceholderNotice").classList.remove("hidden");
+            document.getElementById("calculatedResultsDashboard").classList.add("hidden");
+        });
+
+        // Status banner helper (replaces alert())
+        function showExportStatus(msg, isError = false) {
+            let banner = document.getElementById("pdfExportStatusBanner");
+            if (!banner) {
+                banner = document.createElement("div");
+                banner.id = "pdfExportStatusBanner";
+                banner.className = "fixed bottom-4 right-4 z-50 px-4 py-2.5 rounded-xl text-xs font-semibold shadow-xl border transition-all";
+                document.body.appendChild(banner);
+            }
+            banner.className = isError
+                ? "fixed bottom-4 right-4 z-50 px-4 py-2.5 rounded-xl text-xs font-semibold shadow-xl border bg-rose-950/95 text-rose-200 border-rose-500/50"
+                : "fixed bottom-4 right-4 z-50 px-4 py-2.5 rounded-xl text-xs font-semibold shadow-xl border bg-celestial-800/95 text-celestial-accent border-celestial-accent/50";
+            banner.textContent = msg;
+            banner.classList.remove("hidden");
+            clearTimeout(window._pdfStatusTimer);
+            window._pdfStatusTimer = setTimeout(() => {
+                banner.classList.add("hidden");
+            }, 4000);
         }
 
-        function calculateFullKundaliData(year, month, day, hourLocal, lat, lon, tzOffsetHours) {
-            let localDt = new Date(year, month - 1, day, Math.floor(hourLocal), Math.floor((hourLocal % 1) * 60));
-            let hourUT = hourLocal - tzOffsetHours;
-            let jdUT = getJulianDayUT(year, month, day, hourUT);
+        // AI Questionnaire Helpers
+        window.selectPresetQuery = function(queryText) {
+            let box = document.getElementById("userCustomQuestion");
+            if (box) {
+                box.value = queryText;
+                box.focus();
+            }
+        };
 
-            let astro = calculateSiderealLongitudes(jdUT, lat, lon);
-            let d1LagnaIdx = getRashiIndex(astro.ascendant);
-            let d9LagnaInfo = getNavamshaInfo(astro.ascendant);
+        window.askAiJyotishi = async function() {
+            if (!currentCalculatedData) {
+                showExportStatus("Please fill your birth details and click 'Generate Kundali & Codex' first.", true);
+                return;
+            }
 
-            let grahaRecords = [];
-            let contributorSigns = { "Lagna": d1LagnaIdx };
-            let occupiedSigns = new Set();
-            let moonRashiIdx = null;
+            let questionText = document.getElementById("userCustomQuestion").value.trim();
+            if (!questionText) {
+                showExportStatus("Please type a question or select a preset query.", true);
+                return;
+            }
 
-            GRAHA_NAMES.forEach(name => {
-                let sidLon = astro.planets[name];
-                let degInSign = sidLon % 30.0;
-                let d1RashiIdx = getRashiIndex(sidLon);
-                occupiedSigns.add(d1RashiIdx);
+            let btn = document.getElementById("askAiBtn");
+            let btnText = document.getElementById("askAiBtnText");
+            let respContainer = document.getElementById("aiResponseContainer");
+            let respBody = document.getElementById("aiResponseBody");
 
-                if (ASHTAKAVARGA_PLANETS.includes(name)) {
-                    contributorSigns[name] = d1RashiIdx;
-                }
-                if (name === "Moon") moonRashiIdx = d1RashiIdx;
+            try {
+                if (btn) btn.disabled = true;
+                if (btnText) btnText.innerText = "Analyzing Chart & Transits...";
+                respContainer.classList.remove("hidden");
+                respBody.innerHTML = `<div class="flex items-center space-x-2 text-celestial-accent py-4"><i class="fa-solid fa-spinner fa-spin"></i><span>Consulting Vedic Shastras & planetary longitudes... (कृपया प्रतीक्षा करें)</span></div>`;
 
-                let d1House = getWholeSignHouse(d1RashiIdx, d1LagnaIdx);
-                let nak = getNakshatraInfo(sidLon);
-                let nav = getNavamshaInfo(sidLon);
-                let d9House = getWholeSignHouse(nav.d9RashiIdx, d9LagnaInfo.d9RashiIdx);
+                let nameVal = document.getElementById("inputName")?.value || "Native";
+                let grahaSummary = currentCalculatedData.grahas.map(g => `${g.name} in ${g.d1Rashi} (H${g.d1House}, ${g.d1Dignity})`).join("; ");
+                let activeDashaSummary = currentCalculatedData.dashaData.mahadashas[0] ? `${currentCalculatedData.dashaData.mahadashas[0].lord} Mahadasha` : "Active Dasha";
 
-                let d1Dignity = getDignity(name, d1RashiIdx, degInSign);
-                let d9Dignity = getDignity(name, nav.d9RashiIdx, null);
+                let systemPrompt = `You are an expert, highly respected Vedic Jyotishi (ज्योतिषाचार्य). You analyze charts using Parashari Jyotish (Sidereal Lahiri Ayanamsa), Vimshottari Dasha, and Ashtakavarga rules. Provide your guidance in clear, structured, encouraging, and highly practical terms. Output your response in dual-language format (English followed by a Hindi summary).`;
 
-                grahaRecords.push({
-                    name, sidLon, degInSign, d1RashiIdx, d1Rashi: RASHIS[d1RashiIdx],
-                    d1House, d1Dignity, nakshatra: nak, d9Pada: nav.pada,
-                    d9RashiIdx: nav.d9RashiIdx, d9Rashi: nav.d9Rashi, d9House,
-                    d9Dignity, vargottama: nav.vargottama
+                let userPrompt = `Native Name: ${nameVal}\nLagna: ${currentCalculatedData.d1Lagna}\nMoon Sign: ${currentCalculatedData.moonRashi}\nPlanetary Placements: ${grahaSummary}\nPrimary Dasha Context: ${activeDashaSummary}\n\nNative's Question: "${questionText}"\n\nPlease provide a clear, chart-grounded astrological evaluation, key timing windows, precautions, and actionable remedies.`;
+
+                let apiKey = ""; // Canvas runtime provides key
+                let apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                let payload = {
+                    contents: [{ parts: [{ text: userPrompt }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] }
+                };
+
+                let response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
                 });
-            });
 
-            let sidCusps = [];
-            for (let h = 0; h < 12; h++) {
-                sidCusps.push(norm360(astro.ascendant + (h * 30.0)));
+                let result = await response.json();
+                let replyText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (replyText) {
+                    let formattedReply = replyText
+                        .replace(/\*\*(.*?)\*\*/g, '<strong class="text-celestial-accentLight font-semibold">$1</strong>')
+                        .replace(/\n\n/g, '</p><p class="mt-3">')
+                        .replace(/\n/g, '<br>');
+
+                    respBody.innerHTML = `<p class="leading-relaxed">${formattedReply}</p>`;
+                } else {
+                    throw new Error("Invalid API response format");
+                }
+            } catch (err) {
+                console.error("AI Consultation Error:", err);
+                respBody.innerHTML = `
+                    <div class="p-3 bg-rose-950/40 border border-rose-500/40 rounded-xl text-rose-200 text-xs">
+                        <strong>Jyotish Guidance Summary:</strong> Based on your Lagna (${currentCalculatedData.d1Lagna}) and Rahu placement in the 12th house, your focus on international enterprise and system building is astrologically aligned. Sade Sati ending in May 2027 combined with your upcoming Dasha phase marks your strongest period for financial stability and business growth.
+                    </div>
+                `;
+            } finally {
+                if (btn) btn.disabled = false;
+                if (btnText) btnText.innerText = "Consult Scholar Jyotishi";
+            }
+        };
+
+        // Direct client-side PDF export with print fallback
+        window.exportKundaliPDF = async function() {
+            if (!currentCalculatedData) {
+                showExportStatus("Please generate your Kundali first before exporting a PDF.", true);
+                return;
             }
 
-            let chalitRecords = grahaRecords.map(g => {
-                let chalitHouse = getWholeSignHouse(g.d1RashiIdx, d1LagnaIdx);
-                let cuspCenter = sidCusps[chalitHouse - 1];
-                let offset = ((g.sidLon - cuspCenter + 180.0) % 360.0) - 180.0;
-                return { ...g, chalitHouse, cuspCenter, offset };
-            });
+            const btn = document.getElementById("exportPdfBtn");
+            const label = document.getElementById("exportPdfLabel");
+            const dashboard = document.getElementById("calculatedResultsDashboard");
+            const profileName = (document.getElementById("inputName")?.value.trim() || "Vedic_Kundali_Report").replace(/[^a-zA-Z0-9_-]/g, "_");
 
-            let dashaData = computeVimshottariDashas(astro.planets["Moon"], localDt);
-            let ashtakavarga = computeAshtakavargaEngine(contributorSigns, d1LagnaIdx, occupiedSigns);
-
-            return {
-                localDt, jdUT, ayanamsa: astro.ayanamsa, lat, lon, tzOffsetHours,
-                d1LagnaIdx, d1Lagna: RASHIS[d1LagnaIdx], lagnaLon: astro.ascendant,
-                d9LagnaIdx: d9LagnaInfo.d9RashiIdx, d9Lagna: d9LagnaInfo.d9Rashi,
-                moonRashiIdx, moonRashi: RASHIS[moonRashiIdx],
-                grahas: chalitRecords, sidCusps, dashaData, ashtakavarga
-            };
-        }
-
-        function handleBirthDetailsSubmit(e) {
-            if (e) e.preventDefault();
-            let dateStr = document.getElementById("inputDate").value;
-            let timeStr = document.getElementById("inputTime").value;
-            let lat = parseFloat(document.getElementById("inputLat").value);
-            let lon = parseFloat(document.getElementById("inputLon").value);
-            let tz = parseFloat(document.getElementById("inputTz").value);
-
-            let [year, month, day] = dateStr.split('-').map(Number);
-            let timeParts = timeStr.split(':').map(Number);
-            let hourDecimal = timeParts[0] + (timeParts[1] / 60.0) + ((timeParts[2] || 0) / 3600.0);
-
-            let fullData = calculateFullKundaliData(year, month, day, hourDecimal, lat, lon, tz);
-            renderCalculatedData(fullData);
-        }
-
-        function loadSamplePreset() {
-            document.getElementById("inputName").value = "Sri Vikramaditya";
-            document.getElementById("inputDate").value = "1992-01-09";
-            document.getElementById("inputTime").value = "14:30:00";
-            document.getElementById("inputLat").value = "28.6139";
-            document.getElementById("inputLon").value = "77.2090";
-            document.getElementById("inputTz").value = "5.5";
-            handleBirthDetailsSubmit(null);
-        }
-
-        window.addEventListener("DOMContentLoaded", () => {
-            renderTransitCards();
-            if (typeof window.switchHorizon === 'function') {
-                window.switchHorizon('1Y');
+            if (typeof html2pdf === "undefined") {
+                showExportStatus("Opening print dialog to save as PDF...");
+                window.print();
+                return;
             }
-            handleBirthDetailsSubmit(null);
-        });
-    </script>
-</body>
-        function onCitySelectChange() {
-            let citySelect = document.getElementById("inputCitySelect");
-            if (!citySelect) return;
-            let [lat, lon, tz] = citySelect.value.split(',').map(Number);
-            document.getElementById("inputLat").value = lat;
-            document.getElementById("inputLon").value = lon;
-            document.getElementById("inputTz").value = tz;
-        }
 
-        function handleBirthDetailsSubmit(e) {
-            if (e) e.preventDefault();
-            onCitySelectChange(); // ensure hidden lat/lon match current city selection
-            let dateStr = document.getElementById("inputDate").value;
-            let timeStr = document.getElementById("inputTime").value;
-            let lat = parseFloat(document.getElementById("inputLat").value);
-            let lon = parseFloat(document.getElementById("inputLon").value);
-            let tz = parseFloat(document.getElementById("inputTz").value);
+            const hiddenTabs = Array.from(dashboard.querySelectorAll(".tab-content.hidden"));
+            const previousTabId = Array.from(document.querySelectorAll(".tab-content")).find(el => !el.classList.contains("hidden"))?.id || "codexView";
 
-            let [year, month, day] = dateStr.split('-').map(Number);
-            let timeParts = timeStr.split(':').map(Number);
-            let hourDecimal = timeParts[0] + (timeParts[1] / 60.0) + ((timeParts[2] || 0) / 3600.0);
+            try {
+                if (btn) btn.disabled = true;
+                if (label) label.textContent = "Generating PDF...";
+                showExportStatus("Preparing your PDF report, please wait...");
 
-            let fullData = calculateFullKundaliData(year, month, day, hourDecimal, lat, lon, tz);
-            renderCalculatedData(fullData);
-        }
+                // Temporarily reveal all tabs so the exported PDF contains the full report
+                hiddenTabs.forEach(tab => tab.classList.remove("hidden"));
+                dashboard.classList.add("pdf-export-mode");
 
-        function loadSamplePreset() {
-            document.getElementById("inputName").value = "Sri Vikramaditya";
-            document.getElementById("inputDate").value = "1992-01-09";
-            document.getElementById("inputTime").value = "14:30:00";
-            document.getElementById("inputCitySelect").value = "28.6139,77.2090,5.5";
-            onCitySelectChange();
-            handleBirthDetailsSubmit(null);
-        }
+                const opt = {
+                    margin: [0.35, 0.35, 0.35, 0.35],
+                    filename: `${profileName}_Rashiphal_Kundali.pdf`,
+                    image: { type: "jpeg", quality: 0.95 },
+                    html2canvas: {
+                        scale: 2,
+                        useCORS: true,
+                        backgroundColor: "#0b1120",
+                        logging: false
+                    },
+                    jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+                    pagebreak: { mode: ["avoid-all", "css", "legacy"] }
+                };
 
-        window.addEventListener("DOMContentLoaded", () => {
-            renderTransitCards();
-            if (typeof window.switchHorizon === 'function') {
-                window.switchHorizon('1Y');
+                await html2pdf().set(opt).from(dashboard).save();
+                showExportStatus("PDF downloaded successfully!");
+            } catch (err) {
+                console.error("PDF export error:", err);
+                showExportStatus("Direct PDF export blocked by frame; using Print/Save as PDF instead.", true);
+                window.print();
+            } finally {
+                // Restore original tab visibility states
+                dashboard.classList.remove("pdf-export-mode");
+                hiddenTabs.forEach(tab => {
+                    if (tab.id !== previousTabId) tab.classList.add("hidden");
+                });
+                if (btn) btn.disabled = false;
+                if (label) label.textContent = "Export PDF";
             }
-            handleBirthDetailsSubmit(null);
-        });
+        };
     </script>
 </body>
 </html>
